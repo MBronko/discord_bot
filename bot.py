@@ -5,8 +5,6 @@ import asyncio
 from create_db import create_db
 import sqlite3
 
-description = 'No siemano tutej so komendy do bota i w ogóle'
-
 db_name = 'botdb.db'
 create_db(db_name)
 conn = sqlite3.connect(db_name)
@@ -18,17 +16,20 @@ def getprefix(bot, message):
     server_id = message.guild.id
     cur.execute("SELECT info FROM rules WHERE server = ? AND type = 'prefix'", (server_id,))
     try:
-        xd = cur.fetchone()[0]
+        prefix = cur.fetchone()[0]
     except TypeError:
-        xd = ''
-    return xd
+        prefix = ''
+    return prefix
 
 
+description = 'No siemano tutej so komendy do bota i w ogóle'
 bot = commands.Bot(command_prefix=getprefix, description=description)
 
 # 328935623144636426 mlp id
 @bot.event
 async def on_ready():
+    game = discord.Game("gituwa elo")
+    await bot.change_presence(activity=game)
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
@@ -37,9 +38,36 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
+    if isinstance(error, commands.CommandNotFound) or isinstance(error, commands.errors.BadArgument):
         return
     raise error
+
+
+@bot.command()
+async def kick(ctx, member: discord.User):
+    print(member.avatar_url)
+
+
+@bot.command()
+async def tft(ctx, times=''):
+    try:
+        times = int(times) if 20 >= int(times) > 0 and times != '' else 2
+    except Exception:
+        times = 2
+    types = ['Infiltrator', 'Sorcerer', 'Blademaster', 'Brawler', 'Mystic', 'Protector', 'Sniper', 'Blaster',
+             'Demolitionist', 'Mana-Reaver', 'Vanguard', 'Dark Star', 'Mech Pilot', 'Cybernetic', 'Star Guardian',
+             'Chrono', 'Celestial', 'Space Pirate', 'Void', 'Rebel']
+    random.shuffle(types)
+    msg = ''
+    for _ in range(times):
+        msg += 'i ' + types.pop() + ' '
+    await ctx.send(msg[2:])
+
+
+@bot.command()
+async def avatar(ctx, member: discord.User):
+    """Ukradnij komuś avatarek"""
+    await ctx.send(member.avatar_url)
 
 
 @bot.command()
