@@ -17,4 +17,4 @@ def create_db(db_name):
                      (user TEXT, server TEXT, channel TEXT, command TEXT, time TEXT)''')
 
         conn.commit()
-        return conn
+        conn.close()

@@ -3,29 +3,30 @@ from discord.ext import commands
 import random
 import asyncio
 from create_db import create_db
+import sqlite3
 
-description = '''An example bot to showcase the discord.ext.commands extension
-module.
-There are a number of utility commands being showcased here.'''
-bot = commands.Bot(command_prefix='', description=description)
+description = 'No siemano tutej so komendy do bota i w ogóle'
 
 db_name = 'botdb.db'
-conn = create_db(db_name)
+create_db(db_name)
+conn = sqlite3.connect(db_name)
+cur = conn.cursor()
 token = open('token.txt').readline().strip('\n')
 
-# else:
-#     conn = sqlite3.connect(db_name)
-#     c = conn.cursor()
-#
-#     c.execute("INSERT INTO rules (server, channel, user) values (?, ?, ?)", ("xd", "xdd", "xddd"))
-#
-#     conn.commit()
-#
-#     c.execute('''SELECT * FROM rules''')
-#     print(c.fetchall())
-#
-#     conn.close()
 
+def getprefix(bot, message):
+    server_id = message.guild.id
+    cur.execute("SELECT info FROM rules WHERE server = ? AND type = 'prefix'", (server_id,))
+    try:
+        xd = cur.fetchone()[0]
+    except TypeError:
+        xd = ''
+    return xd
+
+
+bot = commands.Bot(command_prefix=getprefix, description=description)
+
+# 328935623144636426 mlp id
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -33,42 +34,55 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    raise error
+
+
 @bot.command()
 async def eluwa(ctx):
+    """Przywitaj się"""
     await ctx.send('no siemano')
+
 
 @bot.command()
 async def add(ctx, left: int, right: int):
-    """Adds two numbers together."""
+    """Dodej se dwie liczby."""
     await ctx.send(left + right)
 
-@bot.command(description='For when you wanna settle the score some other way')
+
+@bot.command()
 async def choose(ctx, *choices: str):
-    """Chooses between multiple choices."""
+    """Wybierz za mnie :v oddziel możliwości spacją"""
     await ctx.send(random.choice(choices))
+
 
 @bot.command()
 async def repeat(ctx, content, times: int, ):
-    """Repeats a message multiple times."""
+    """Powtórz wiadomość pare razy"""
     print("{} powtarza {} - {} razy".format(ctx.author, content, times))
     for i in range(times):
         await ctx.send(content)
 
-@bot.command()
-async def joined(ctx, member: discord.Member):
-    """Says when a member joined."""
-    await ctx.send('{0.name} joined in {0.joined_at}'.format(member))
-
-
-# @bot.command()
-# async def kick(ctx, person):
 
 @bot.command()
 async def changepref(ctx, prefix):
-    bot.command_prefix = prefix
+    """Zmień se prefixa"""
+    cur.execute('SELECT * FROM rules WHERE server = ? AND type="prefix"', (ctx.guild.id,))
+    if cur.fetchone():
+        cur.execute('UPDATE rules SET info = ? WHERE server = ?', (prefix, ctx.guild.id))
+    else:
+        cur.execute('INSERT INTO rules (server, type, info) values (?, "prefix", ?)', (ctx.guild.id, prefix))
+    conn.commit()
+    await ctx.send("Zmieniono prefix na `{}`".format(prefix if prefix != '' else ' '))
+
 
 @bot.command()
 async def dele(ctx, times):
+    """Usuń ileś tam wiadomości"""
     try:
         limit = int(times)+1 if int(times) <= 100 else 100
         await ctx.send("bedzie usuwanko", delete_after=1)
