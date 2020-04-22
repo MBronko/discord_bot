@@ -2,11 +2,29 @@ import discord
 from discord.ext import commands
 import random
 import asyncio
+from create_db import create_db
 
 description = '''An example bot to showcase the discord.ext.commands extension
 module.
 There are a number of utility commands being showcased here.'''
 bot = commands.Bot(command_prefix='', description=description)
+
+db_name = 'botdb.db'
+conn = create_db(db_name)
+token = open('token.txt').readline().strip('\n')
+
+# else:
+#     conn = sqlite3.connect(db_name)
+#     c = conn.cursor()
+#
+#     c.execute("INSERT INTO rules (server, channel, user) values (?, ?, ?)", ("xd", "xdd", "xddd"))
+#
+#     conn.commit()
+#
+#     c.execute('''SELECT * FROM rules''')
+#     print(c.fetchall())
+#
+#     conn.close()
 
 @bot.event
 async def on_ready():
@@ -59,4 +77,4 @@ async def dele(ctx, times):
     except ValueError:
         await ctx.send("liczbami upośledziu", delete_after=2)
 
-bot.run('NjY1MTQzODA0MzczNzYyMDc4.Xp7ULQ.yCt9u9jOzQRRZ6gZOLBCpt1dPIs')
+bot.run(token)
