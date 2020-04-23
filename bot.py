@@ -10,25 +10,37 @@ create_db(db_name)
 conn = sqlite3.connect(db_name)
 cur = conn.cursor()
 token = open('token.txt').readline().strip('\n')
+default_prefix = ''
+initial_extensions = [
+    'cogs.lol',
+]
 
 
-def getprefix(bot, message):
-    server_id = message.guild.id
-    cur.execute("SELECT info FROM rules WHERE server = ? AND type = 'prefix'", (server_id,))
-    try:
-        prefix = cur.fetchone()[0]
-    except TypeError:
-        prefix = ''
-    return prefix
+def getprefix(bott, message):
+    if message.guild is None:
+        prefix = default_prefix
+    else:
+        server_id = message.guild.id
+        cur.execute("SELECT info FROM rules WHERE server = ? AND type = 'prefix'", (server_id,))
+        try:
+            prefix = cur.fetchone()[0]
+        except TypeError:
+            prefix = default_prefix
+    return commands.when_mentioned_or(prefix)(bott, message)
 
 
-description = 'No siemano tutej so komendy do bota i w ogóle'
+description = 'No siemano tutej so komendy do bota i w ogóle, jeżeli zapomnisz prefixu to możesz też wywołać ' \
+              'komende pingując bota'
 bot = commands.Bot(command_prefix=getprefix, description=description)
 
 # 328935623144636426 mlp id
+if __name__ == '__main__':
+    for extension in initial_extensions:
+        bot.load_extension(extension)
+
 @bot.event
 async def on_ready():
-    game = discord.Game("gituwa elo")
+    game = discord.Game("gituuwa elo", type=1, url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')
     await bot.change_presence(activity=game)
     print('Logged in as')
     print(bot.user.name)
@@ -46,22 +58,6 @@ async def on_command_error(ctx, error):
 @bot.command()
 async def kick(ctx, member: discord.User):
     print(member.avatar_url)
-
-
-@bot.command()
-async def tft(ctx, times=''):
-    try:
-        times = int(times) if 20 >= int(times) > 0 and times != '' else 2
-    except Exception:
-        times = 2
-    types = ['Infiltrator', 'Sorcerer', 'Blademaster', 'Brawler', 'Mystic', 'Protector', 'Sniper', 'Blaster',
-             'Demolitionist', 'Mana-Reaver', 'Vanguard', 'Dark Star', 'Mech Pilot', 'Cybernetic', 'Star Guardian',
-             'Chrono', 'Celestial', 'Space Pirate', 'Void', 'Rebel']
-    random.shuffle(types)
-    msg = ''
-    for _ in range(times):
-        msg += 'i ' + types.pop() + ' '
-    await ctx.send(msg[2:])
 
 
 @bot.command()
@@ -99,6 +95,8 @@ async def repeat(ctx, content, times: int, ):
 @bot.command()
 async def changepref(ctx, prefix):
     """Zmień se prefixa"""
+    if ctx.guild is None:
+        return
     cur.execute('SELECT * FROM rules WHERE server = ? AND type="prefix"', (ctx.guild.id,))
     if cur.fetchone():
         cur.execute('UPDATE rules SET info = ? WHERE server = ?', (prefix, ctx.guild.id))
@@ -114,7 +112,7 @@ async def dele(ctx, times):
     try:
         limit = int(times)+1 if int(times) <= 100 else 100
         await ctx.send("bedzie usuwanko", delete_after=1)
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         await ctx.channel.purge(limit=limit)
     except ValueError:
         await ctx.send("liczbami upośledziu", delete_after=2)
