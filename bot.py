@@ -38,6 +38,7 @@ if __name__ == '__main__':
     for extension in initial_extensions:
         bot.load_extension(extension)
 
+
 @bot.event
 async def on_ready():
     game = discord.Game("gituuwa elo", type=1, url='https://www.youtube.com/watch?v=dQw4w9WgXcQ')
@@ -48,12 +49,28 @@ async def on_ready():
     print('------')
 
 
+
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound) or isinstance(error, commands.errors.BadArgument):
         return
     raise error
 
+
+@bot.event
+async def on_message(message):
+    mlp = bot.get_guild(328935623144636426)
+    emojis = list(mlp.emojis)
+    cursedlist = [
+        'Miraś',
+        'Zbugowany',
+        'Ryear'
+    ]
+    if message.author.display_name in cursedlist:
+        random.shuffle(emojis)
+        for x in range(15):
+            await message.add_reaction(emojis[x])
+    await bot.process_commands(message)
 
 @bot.command()
 async def kick(ctx, member: discord.User):
