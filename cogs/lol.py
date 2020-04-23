@@ -62,10 +62,10 @@ async def return_champ(ctx, times, lane):
         times = int(times) if len(champs) >= int(times) > 0 and times != '' else 1
     except Exception:
         times = 1
-    msg = ''
+    msg = []
     for _ in range(times):
-        msg += '/' + champs.pop()
-    await ctx.send("```{}```".format(msg[1:]))
+        msg.append(champs.pop())
+    await ctx.send("```{}```".format('/'.join(msg)))
 
 
 class LolCog(commands.Cog):
@@ -108,6 +108,7 @@ class LolCog(commands.Cog):
         await ctx.send("```{}```".format('\n'.join(champs)))
 
     @commands.command()
+    # @commands.guild_only()
     async def tft(self, ctx, times=''):
         try:
             times = int(times) if 20 >= int(times) > 0 and times != '' else 2
@@ -117,10 +118,10 @@ class LolCog(commands.Cog):
                  'Demolitionist', 'Mana-Reaver', 'Vanguard', 'Dark Star', 'Mech Pilot', 'Cybernetic', 'Star Guardian',
                  'Chrono', 'Celestial', 'Space Pirate', 'Void', 'Rebel']
         random.shuffle(types)
-        msg = ''
+        msg = []
         for _ in range(times):
-            msg += 'i ' + types.pop() + ' '
-        await ctx.send(msg[2:])
+            msg.append(types.pop())
+        await ctx.send(' i '.join(msg))
 
 
 def setup(bot):
