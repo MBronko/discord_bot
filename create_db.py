@@ -16,5 +16,8 @@ def create_db(db_name):
         c.execute('''CREATE TABLE logs
                      (user TEXT, server TEXT, channel TEXT, command TEXT, time TEXT)''')
 
+        c.execute('''CREATE TABLE lolchamps
+                     (champ TEXT, top TEXT, jungle TEXT, middle TEXT, adc TEXT, support TEXT)''')
+
         conn.commit()
         conn.close()

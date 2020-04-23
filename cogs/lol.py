@@ -5,9 +5,16 @@ from requests.exceptions import RequestException
 from contextlib import closing
 from bs4 import BeautifulSoup
 import random
+import sqlite3
+import json
+import re
 
 wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions/Position'
+gg_url = 'https://champion.gg/statistics/'
 
+db_name = 'botdb.db'
+conn = sqlite3.connect(db_name)
+cur = conn.cursor()
 
 def log_error(e):
     print(e)
@@ -32,83 +39,79 @@ def simple_get(url):
         return None
 
 
-def get_champions_list():
-    html = BeautifulSoup(simple_get(wiki_url), 'html.parser')
-    the_table = html.find("table", class_="article-table sortable")
-    total = []
-    for row in the_table.find_all('tr')[1:]:
-        tmp_list = [(row.find_all('td')[0].text.strip())]
-        for td in row.find_all('td')[1:-1]:
-            if td.find_all() or td.text.strip() != '':
-                tmp_list.append("tak")
-            else:
-                tmp_list.append("nie")
-        total.append(tmp_list)
-    return total
+async def fetch_champions(ctx, times, lane='team'):
+    cur.execute('SELECT * from rules where type="lolchamps" and '
+                '(strftime("%s",current_timestamp)-strftime("%s",info)>60*60*24*7)')
+    if cur.fetchone():
+        cur.execute('DELETE FROM rules where type="lolchamps"')
+        cur.execute('DELETE FROM "lolchamps"')
+        cur.execute('INSERT INTO rules (type, info) values ("lolchamps", current_timestamp)')
 
+        html = BeautifulSoup(simple_get(wiki_url), 'html.parser')
+        the_table = html.find("table", class_="article-table sortable")
+        total = []
+        for row in the_table.find_all('tr')[1:]:
+            tmp_list = [(row.find_all('td')[0].text.strip())]
+            for td in row.find_all('td')[1:-1]:
+                if td.find_all() or td.text.strip() != '':
+                    tmp_list.append("tak")
+                else:
+                    tmp_list.append("nie")
+            total.append(tmp_list)
+        cur.executemany('INSERT INTO lolchamps (champ, top, jungle, middle, adc, support) values (?,?,?,?,?,?)', total)
+        html = BeautifulSoup(simple_get(gg_url), 'html.parser')
+        json_data = html.find("script", text=re.compile('matchupData.stats'))
+        data = json.loads(json_data.string.replace('matchupData.stats = ', '').strip('')[:-2])
 
-def get_champions_by_lane(lane):
-    champs = []
-    for champ in get_champions_list():
-        if champ[lane] == 'tak':
-            champs.append(champ[0])
-    random.shuffle(champs)
-    return champs
+        for champ in data:
+            cur.execute('UPDATE lolchamps SET %s = "tak" WHERE champ = ?' % champ['role'].lower(), (champ['title'],))
+        conn.commit()
 
-
-async def return_champ(ctx, times, lane):
-    champs = get_champions_by_lane(lane)
     try:
-        times = int(times) if len(champs) >= int(times) > 0 and times != '' else 1
+        times = int(times) if int(times) > 0 and times != '' else 1
     except Exception:
         times = 1
-    msg = []
-    for _ in range(times):
-        msg.append(champs.pop())
-    await ctx.send("```{}```".format('/'.join(msg)))
+    if lane != 'team':
+        cur.execute('SELECT champ FROM lolchamps WHERE %s = "tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,))
+        await ctx.send('```{}```'.format("/".join(map(lambda x: x[0], cur.fetchall()))))
+    else:
+        lanes = ['top', 'jungle', 'middle', 'adc', 'support']
+        team_champs = []
+        for lane in lanes:
+            cur.execute('SELECT champ FROM lolchamps WHERE %s = "tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,))
+            team_champs.append(lane.capitalize() + ": " + "/".join(map(lambda x: x[0], cur.fetchall())))
+        await ctx.send('```{}```'.format("\n".join(team_champs)))
 
 
 class LolCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=('toplane',))
     async def top(self, ctx, times=''):
-        await return_champ(ctx, times, 1)
+        await fetch_champions(ctx, times, "top")
 
-    @commands.command()
+    @commands.command(aliases=('jgl',))
     async def jungle(self, ctx, times=''):
-        await return_champ(ctx, times, 2)
+        await fetch_champions(ctx, times, "jungle")
 
-    @commands.command()
+    @commands.command(aliases=('middle', 'midlane'))
     async def mid(self, ctx, times=''):
-        await return_champ(ctx, times, 3)
+        await fetch_champions(ctx, times, "middle")
 
     @commands.command()
     async def adc(self, ctx, times=''):
-        await return_champ(ctx, times, 4)
+        await fetch_champions(ctx, times, "adc")
 
-    @commands.command()
+    @commands.command(aliases=('support',))
     async def supp(self, ctx, times=''):
-        await return_champ(ctx, times, 5)
+        await fetch_champions(ctx, times, "support")
 
     @commands.command()
-    async def team(self, ctx):
-        champs = []
-        used = []
-        champion_list = get_champions_list()
-        random.shuffle(champion_list)
-        lanes = ['Top', 'Jungle', 'Mid', 'Adc', 'Supp']
-        for x in range(1, 6):
-            for champ in champion_list:
-                if champ[x] == 'tak' and not champ[0] in used:
-                    champs.append('{}: {}'.format(lanes[x-1], champ[0]))
-                    used.append(champ[0])
-                    break
-        await ctx.send("```{}```".format('\n'.join(champs)))
+    async def team(self, ctx, times=''):
+        await fetch_champions(ctx, times)
 
     @commands.command()
-    # @commands.guild_only()
     async def tft(self, ctx, times=''):
         try:
             times = int(times) if 20 >= int(times) > 0 and times != '' else 2
