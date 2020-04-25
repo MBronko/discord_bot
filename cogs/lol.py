@@ -1,7 +1,7 @@
 from discord.ext import commands
 import random
 from cogs.webscraping import fetch_champions
-from manage_db import *
+from manage_db import query_insert
 
 
 class LeagueOfLegends(commands.Cog):

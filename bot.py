@@ -1,5 +1,5 @@
-from manage_db import *
-from functions import *
+from manage_db import query_insert, create_db
+from functions import getprefix
 from discord.ext import commands
 import discord
 import asyncio
@@ -12,7 +12,8 @@ token = open('token.txt').readline().strip('\n')
 initial_extensions = [
     'cogs.lol',
     'cogs.main',
-    'cogs.settings'
+    'cogs.settings',
+    # 'cogs.errorhandle'
 ]
 
 description = 'No siemano tutej so komendy do bota i w ogóle, jeżeli zapomnisz prefixu to możesz też wywołać ' \
@@ -34,9 +35,19 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound) or isinstance(error, commands.errors.BadArgument):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    if isinstance(error, commands.errors.BadArgument):
+        print("Bad argument")
+        await ctx.send("Error: BadArgument", delete_after=2)
         return
     raise error
+
+
+@bot.event
+async def on_command(ctx):
+    inf = (ctx.guild.name, ctx.channel.name, ctx.author.name + "#" + str(ctx.author.discriminator), ctx.message.content)
+    query_insert('INSERT INTO logs (server, channel, user, command, time) values (?, ?, ?, ?, current_timestamp)', inf)
 
 
 @bot.event

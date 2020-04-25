@@ -1,5 +1,5 @@
 from discord.ext import commands
-from manage_db import *
+from manage_db import query_select, query_insert
 
 
 class Settings(commands.Cog):

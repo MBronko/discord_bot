@@ -1,5 +1,5 @@
 from discord.ext import commands
-from manage_db import *
+from manage_db import query_select
 
 default_prefix = ''
 
@@ -14,3 +14,14 @@ def getprefix(bot, message):
         except TypeError:
             prefix = default_prefix
     return commands.when_mentioned_or(prefix)(bot, message)
+
+
+def tryconvert(value, default=0, *types):
+    if not types:
+        types = (int,)
+    for t in types:
+        try:
+            return t(value)
+        except (ValueError, TypeError):
+            continue
+    return default

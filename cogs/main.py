@@ -1,43 +1,46 @@
 from discord.ext import commands
 from discord.ext.commands.errors import MissingPermissions
+from manage_db import query_selectall
 import discord
 import random
 import asyncio
+from functions import tryconvert
 
 
 class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def kick(self, ctx, member: discord.User):
-        # if ctx.author.
-        print(member.avatar_url)
+    # @commands.command()
+    # async def kick(self, ctx, member: discord.User):
+    #     # if ctx.author.
+    #     print(member.avatar_url)
 
-    @commands.command()
+    @commands.command(aliases=('logout',))
     async def stop(self, ctx):
-        """Wyłącz bota"""
+        """Wyłącz bota xd"""
         await self.bot.logout()
 
     @commands.command(aliases=('delete', 'usun', 'fetusdeletus', 'del', 'purge', 'clear'))
-    @commands.has_permissions(manage_messages=True)
-    async def dele(self, ctx, times):
+    # @commands.has_permissions(manage_messages=True)
+    async def dele(self, ctx, times: tryconvert = 0):
         """Usuń ileś tam wiadomości"""
-        # if ctx.author.
-        try:
-            limit = int(times) + 1 if int(times) <= 100 else 100
-            await ctx.send("bedzie usuwanko", delete_after=1)
-            await asyncio.sleep(2)
-            await ctx.channel.purge(limit=limit)
-        except ValueError:
-            await ctx.send("liczbami upośledziu", delete_after=2)
+        limit = times + 2 if times <= 50 else 50
+        await ctx.send("bedzie usuwanko")
+        await asyncio.sleep(.5)
+        await ctx.channel.purge(limit=limit)
 
-    @dele.error
-    async def kick_error(error, ctx):
-        if isinstance(error, MissingPermissions):
-            await ctx.send("Musisz mieć permisje do usuwania wiadomości")
-            await asyncio.sleep(1)
-            await ctx.channel.purge(limit=2)
+    # @dele.error
+    # async def kick_error(self, ctx, error):
+    #     raise
+        # return
+        # if isinstance(error, MissingPermissions):
+        #     await ctx.send("Musisz mieć permisje do usuwania wiadomości")
+
+    @commands.command()
+    async def logs(self, ctx):
+        for log in query_selectall('SELECT * FROM logs ORDER BY time ASC'):
+            print(log)
 
     @commands.command()
     async def avatar(self, ctx, member: discord.User):
@@ -49,23 +52,27 @@ class Main(commands.Cog):
         """Przywitaj się"""
         await ctx.send('no siemano')
 
-    @commands.command()
-    async def add(self, ctx, left: int, right: int):
-        """Dodej se dwie liczby."""
-        await ctx.send(left + right)
+    @commands.command(aliases=('test',))
+    async def add(self, ctx, *numbers: tryconvert):
+        """Dodej se ileś liczb."""
+        await ctx.send(sum(numbers))
 
     @commands.command(aliases=('rng', 'RNG', 'wybierz', 'losulosu'))
     async def choose(self, ctx, *choices: str):
         """Wybierz za mnie :v oddziel możliwości spacją"""
-        await ctx.send(random.choice(choices))
+        if choices:
+            await ctx.send(random.choice(choices))
 
     @commands.command()
-    async def repeat(self, ctx, content, times: int, ):
+    # async def repeat(self, ctx, *, content, times: tryconvert):
+    async def repeat(self, ctx, *, content):
         """Powtórz wiadomość pare razy"""
-        print("{} powtarza {} - {} razy".format(ctx.author, content, times))
-        for i in range(times if times <= 20 else 20):
-            await ctx.send(content)
-            await asyncio.sleep(1)
+        print(content)
+        # if times:
+        #     print("{} powtarza {} - {} razy".format(ctx.author, content, times))
+        #     for i in range(times if times <= 20 else 20):
+        #         await ctx.send(content)
+        #         await asyncio.sleep(1)
 
 
 def setup(bot):

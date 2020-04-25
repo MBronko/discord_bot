@@ -8,7 +8,7 @@ import json
 import re
 
 wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions/Position'
-gg_url = 'https://champion.gg/statistics/'
+gg_url = 'https://champion.gg/statistics/?league=plat'
 
 
 def log_error(e):
@@ -66,14 +66,18 @@ async def fetch_champions(ctx, times, lane='team'):
     except Exception:
         times = 1
     if lane != 'team':
-        r = query_selectall('SELECT champ FROM lolchamps WHERE %s = ''"tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,))
-        champ_list = map(lambda x: x[0], r)
+        champ_list = query_selectall('SELECT champ FROM lolchamps '
+                                     'WHERE %s = ''"tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,), True)
         await ctx.send('```{}```'.format("/".join(champ_list)))
     else:
         lanes = ['top', 'jungle', 'middle', 'adc', 'support']
         team_champs = []
+        used_champs = []
         for lane in lanes:
-            r = query_selectall('SELECT champ FROM lolchamps WHERE %s="tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,))
-            champ_list = map(lambda x: x[0], r)
+            args = used_champs + list((times,))
+            sql = 'SELECT champ FROM lolchamps WHERE %s="tak" ' \
+                  'AND champ not in (%s) ORDER BY RANDOM() LIMIT ?' % (lane, ','.join(['?']*len(used_champs)))
+            champ_list = query_selectall(sql, args, True)
+            used_champs += champ_list
             team_champs.append(lane.capitalize() + ": " + "/".join(champ_list))
         await ctx.send('```{}```'.format("\n".join(team_champs)))
