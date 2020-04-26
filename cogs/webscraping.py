@@ -61,10 +61,7 @@ async def fetch_champions(ctx, times, lane='team'):
 
         for champ in data:
             query_insert('UPDATE lolchamps SET %s = "tak" WHERE champ = ?' % champ['role'].lower(), (champ['title'],))
-    try:
-        times = int(times) if int(times) > 0 and times != '' else 1
-    except Exception:
-        times = 1
+
     if lane != 'team':
         champ_list = query_selectall('SELECT champ FROM lolchamps '
                                      'WHERE %s = ''"tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,), True)

@@ -1,5 +1,5 @@
 from manage_db import query_insert, create_db
-from functions import getprefix
+from functions import get_prefix
 from discord.ext import commands
 import discord
 import asyncio
@@ -13,13 +13,13 @@ initial_extensions = [
     'cogs.lol',
     'cogs.main',
     'cogs.settings',
-    # 'cogs.errorhandle'
+    'cogs.errorhandle'
 ]
 
 description = 'No siemano tutej so komendy do bota i w ogóle, jeżeli zapomnisz prefixu to możesz też wywołać ' \
               'komende pingując bota'
 
-bot = commands.Bot(command_prefix=getprefix, description=description)
+bot = commands.Bot(command_prefix=get_prefix, description=description)
 
 if __name__ == '__main__':
     for extension in initial_extensions:
@@ -34,19 +34,14 @@ async def on_ready():
 
 
 @bot.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.CommandNotFound):
-        return
-    if isinstance(error, commands.errors.BadArgument):
-        print("Bad argument")
-        await ctx.send("Error: BadArgument", delete_after=2)
-        return
-    raise error
-
-
-@bot.event
 async def on_command(ctx):
-    inf = (ctx.guild.name, ctx.channel.name, ctx.author.name + "#" + str(ctx.author.discriminator), ctx.message.content)
+    try:
+        guild_name = ctx.guild.name
+        channel_name = ctx.channel.name
+    except AttributeError:
+        guild_name = ""
+        channel_name = ""
+    inf = (guild_name, channel_name, ctx.author.name + "#" + str(ctx.author.discriminator), ctx.message.content)
     query_insert('INSERT INTO logs (server, channel, user, command, time) values (?, ?, ?, ?, current_timestamp)', inf)
 
 

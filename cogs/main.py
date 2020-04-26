@@ -1,78 +1,94 @@
 from discord.ext import commands
-from discord.ext.commands.errors import MissingPermissions
+from discord.ext.commands import command
 from manage_db import query_selectall
 import discord
 import random
 import asyncio
-from functions import tryconvert
+from functions import try_convert
 
 
 class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # @commands.command()
-    # async def kick(self, ctx, member: discord.User):
-    #     # if ctx.author.
-    #     print(member.avatar_url)
+    @command()
+    @commands.has_permissions(kick_members=True)
+    async def kick(self, ctx, member: discord.Member, *, reason=""):
+        if ctx.author.top_role > member.top_role:
+            reason = '{}: {}'.format(ctx.author.display_name, reason)
+            await ctx.guild.kick(member, reason=reason)
+            await ctx.send(f"{member.display_name} został wyrzucony z serwera")
+        else:
+            await ctx.send("Osoba którą chcesz kicknąć ma za wysoką rangę")
 
-    @commands.command(aliases=('logout',))
+    @command()
+    @commands.has_permissions(ban_members=True)
+    async def ban(self, ctx, member: discord.Member, *, reason=""):
+        if ctx.author.top_role > member.top_role:
+            reason = '{}: {}'.format(ctx.author.display_name, reason)
+            await ctx.guild.ban(member, reason=reason, delete_message_days = 0)
+            await ctx.send(f"{member.display_name} został zbanowany z serwera")
+        else:
+            await ctx.send("Osoba którą chcesz zbanować ma za wysoką rangę")
+
+    @command(aliases=('logout',))
     async def stop(self, ctx):
         """Wyłącz bota xd"""
         await self.bot.logout()
 
-    @commands.command(aliases=('delete', 'usun', 'fetusdeletus', 'del', 'purge', 'clear'))
-    # @commands.has_permissions(manage_messages=True)
-    async def dele(self, ctx, times: tryconvert = 0):
+    @command(aliases=('delete', 'usun', 'fetusdeletus', 'del', 'purge', 'clear'))
+    @commands.has_permissions(manage_messages=True)
+    async def dele(self, ctx, times: try_convert = 0):
         """Usuń ileś tam wiadomości"""
         limit = times + 2 if times <= 50 else 50
         await ctx.send("bedzie usuwanko")
         await asyncio.sleep(.5)
         await ctx.channel.purge(limit=limit)
 
-    # @dele.error
-    # async def kick_error(self, ctx, error):
-    #     raise
-        # return
-        # if isinstance(error, MissingPermissions):
-        #     await ctx.send("Musisz mieć permisje do usuwania wiadomości")
-
-    @commands.command()
+    @command()
     async def logs(self, ctx):
         for log in query_selectall('SELECT * FROM logs ORDER BY time ASC'):
             print(log)
 
-    @commands.command()
+    @command()
     async def avatar(self, ctx, member: discord.User):
         """Ukradnij komuś avatarek"""
         await ctx.send(member.avatar_url)
 
-    @commands.command(aliases=('siemano', 'hejka', 'czesc', 'witam'))
+    @command(aliases=('siemano', 'hejka', 'czesc', 'witam'))
     async def eluwa(self, ctx):
         """Przywitaj się"""
         await ctx.send('no siemano')
 
-    @commands.command(aliases=('test',))
-    async def add(self, ctx, *numbers: tryconvert):
+    @command()
+    async def add(self, ctx, *numbers: try_convert):
         """Dodej se ileś liczb."""
         await ctx.send(sum(numbers))
 
-    @commands.command(aliases=('rng', 'RNG', 'wybierz', 'losulosu'))
+    @command(aliases=('rng', 'RNG', 'wybierz', 'losulosu'))
     async def choose(self, ctx, *choices: str):
         """Wybierz za mnie :v oddziel możliwości spacją"""
         if choices:
             await ctx.send(random.choice(choices))
 
-    @commands.command()
-    # async def repeat(self, ctx, *, content, times: tryconvert):
-    async def repeat(self, ctx, *, content):
+    @command()
+    async def repeat(self, ctx, *content):
         """Powtórz wiadomość pare razy"""
-        print(content)
-        # if times:
-        #     print("{} powtarza {} - {} razy".format(ctx.author, content, times))
-        #     for i in range(times if times <= 20 else 20):
-        #         await ctx.send(content)
-        #         await asyncio.sleep(1)
+        if content:
+            content = list(content)
+            if len(content) >= 2:
+                try:
+                    popped = int(content[-1])
+                    times = popped if popped <= 20 else 20
+                    content.pop()
+                except ValueError:
+                    times = 1
+            else:
+                times = 1
+            print("{} powtarza {} - {} razy".format(ctx.author, "\"" + " ".join(content) + "\"", times))
+            for i in range(times):
+                await ctx.send(" ".join(content))
+                await asyncio.sleep(1)
 
 
 def setup(bot):

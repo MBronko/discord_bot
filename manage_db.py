@@ -27,7 +27,6 @@ def create_db():
 
 def query_select(sql, args=''):
     conn = sqlite3.connect(db_name)
-    # conn.row_factory = lambda cursor, row: row[0]
     cur = conn.cursor()
     cur.execute(sql, args)
     result = cur.fetchone()
@@ -35,9 +34,9 @@ def query_select(sql, args=''):
     return result
 
 
-def query_selectall(sql, args='', focusonrow=False):
+def query_selectall(sql, args='', focus_on_row=False):
     conn = sqlite3.connect(db_name)
-    if focusonrow:
+    if focus_on_row:
         conn.row_factory = lambda cursor, row: row[0]
     cur = conn.cursor()
     cur.execute(sql, args)
