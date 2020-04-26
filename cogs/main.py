@@ -1,15 +1,48 @@
 from discord.ext import commands
 from discord.ext.commands import command
+# import discord.Embed
 from manage_db import query_selectall
 import discord
 import random
 import asyncio
+from time import strftime
+import time
 from functions import try_convert
 
 
 class Main(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @command()
+    async def info(self, ctx, member: discord.Member):
+        embed = discord.Embed(title="Info o gościu", colour=0x00ffff)
+        # embed.set_image(url="https://rerollcdn.com/items/GuardianAngel.png")
+        embed.set_thumbnail(url=member.avatar_url)
+        embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+        # embed.add_field()
+
+        embed.add_field(name="Display Name", value=member.display_name, inline=False)
+        embed.add_field(name="Created At", value=member.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
+        embed.add_field(name="Joined At", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
+        embed.add_field(name="ID", value=member.id, inline=False)
+        # embed.set_footer(text="Gitara siema")
+        await ctx.send(embed=embed)
+
+    @command()
+    async def mock(self, ctx, *, msg):
+        """tOtAlNiE nIe MaM pOjEcIa Co To RoBi"""
+        mock = ''
+        upper = False
+        for letter in msg:
+            if upper:
+                mock += letter.upper()
+            else:
+                mock += letter.lower()
+            if letter != " ":
+                upper = not upper
+        await ctx.message.delete()
+        await ctx.send(mock)
 
     @command()
     @commands.has_permissions(kick_members=True)
@@ -51,9 +84,12 @@ class Main(commands.Cog):
             print(log)
 
     @command()
-    async def avatar(self, ctx, member: discord.User):
+    async def avatar(self, ctx, member: discord.Member):
         """Ukradnij komuś avatarek"""
-        await ctx.send(member.avatar_url)
+        embed = discord.Embed()
+        embed.set_author(name=member.display_name, url=member.avatar_url)
+        embed.set_image(url=member.avatar_url)
+        await ctx.send(embed=embed)
 
     @command(aliases=('siemano', 'hejka', 'czesc', 'witam'))
     async def eluwa(self, ctx):
