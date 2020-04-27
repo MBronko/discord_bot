@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 .idea/
 token.txt
+botdb.db
 
 # C extensions
 *.so
