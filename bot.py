@@ -19,7 +19,9 @@ initial_extensions = [
 description = 'No siemano tutej so komendy do bota i w ogóle, jeżeli zapomnisz prefixu to możesz też wywołać ' \
               'komende pingując bota'
 
-bot = commands.Bot(command_prefix=get_prefix, description=description)
+owner_id = 322414584256266240
+
+bot = commands.Bot(command_prefix=get_prefix, description=description, owner_id=owner_id)
 
 if __name__ == '__main__':
     for extension in initial_extensions:

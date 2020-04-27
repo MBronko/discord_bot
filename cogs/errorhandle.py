@@ -14,8 +14,8 @@ class CommandErrorHandler(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        ignored = (commands.CommandNotFound, commands.UserInputError)
-
+        # commands.UserInputError
+        ignored = (commands.CommandNotFound,)
         error = getattr(error, 'original', error)
         if isinstance(error, ignored):
             return
@@ -31,8 +31,14 @@ class CommandErrorHandler(commands.Cog):
         # Bad Argument
         elif isinstance(error, commands.BadArgument):
             # Specific answer to commmands
-            if ctx.command.qualified_name == 'avatar':
-                msg = 'Nie moge znaleźć takiej osoby'
+            get_member = [
+                'avatar',
+                'info',
+                'kick',
+                'ban'
+            ]
+            if ctx.command.qualified_name in get_member:
+                msg = 'Nie mogę znaleźć podanej osoby'
             else:
                 msg = 'Error: BadArgument'
             return await ctx.send(msg)

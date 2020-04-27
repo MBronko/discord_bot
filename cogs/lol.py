@@ -13,32 +13,32 @@ class LeagueOfLegends(commands.Cog):
     @command(aliases=('toplane',))
     async def top(self, ctx, times=''):
         """Wylosuj sobie topa"""
-        await fetch_champions(ctx, try_convert(times, 1), "top")
+        await fetch_champions(ctx, try_convert(times, 1), "top", 0xCC0000)
 
     @command(aliases=('jgl',))
     async def jungle(self, ctx, times=''):
         """Wylosuj sobie jungle"""
-        await fetch_champions(ctx, try_convert(times, 1), "jungle")
+        await fetch_champions(ctx, try_convert(times, 1), "jungle", 0x339933)
 
     @command(aliases=('middle', 'midlane'))
     async def mid(self, ctx, times=''):
         """Wylosuj sobie mida"""
-        await fetch_champions(ctx, try_convert(times, 1), "middle")
+        await fetch_champions(ctx, try_convert(times, 1), "middle", 0xFFCC33)
 
     @command()
     async def adc(self, ctx, times=''):
         """Wylosuj sobie adc"""
-        await fetch_champions(ctx, try_convert(times, 1), "adc")
+        await fetch_champions(ctx, try_convert(times, 1), "adc", 0x3399FF)
 
     @command(aliases=('support',))
     async def supp(self, ctx, times=''):
         """Wylosuj sobie suppa"""
-        await fetch_champions(ctx, try_convert(times, 1), "support")
+        await fetch_champions(ctx, try_convert(times, 1), "support", 0xFF99FF)
 
     @command()
     async def team(self, ctx, times=''):
         """Wylosuj sobie cały team"""
-        await fetch_champions(ctx, try_convert(times, 1))
+        await fetch_champions(ctx, try_convert(times, 1), 'team', 0xA652BB)
 
     @command()
     async def resetdb(self, ctx):

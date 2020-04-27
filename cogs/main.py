@@ -15,18 +15,23 @@ class Main(commands.Cog):
         self.bot = bot
 
     @command()
+    async def henlo(self, ctx, members: commands.Greedy[discord.Member]):
+        await ctx.send("henlo "+" ".join(map(lambda x: x.mention, members)))
+
+    @command()
     async def info(self, ctx, member: discord.Member):
         embed = discord.Embed(title="Info o gościu", colour=0x00ffff)
-        # embed.set_image(url="https://rerollcdn.com/items/GuardianAngel.png")
         embed.set_thumbnail(url=member.avatar_url)
         embed.set_author(name=member.display_name, icon_url=member.avatar_url)
-        # embed.add_field()
 
-        embed.add_field(name="Display Name", value=member.display_name, inline=False)
+        embed.add_field(name="Display Name", value=member.display_name, inline=True)
+        embed.add_field(name="Discriminator", value=member.discriminator, inline=True)
         embed.add_field(name="Created At", value=member.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
         embed.add_field(name="Joined At", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
         embed.add_field(name="ID", value=member.id, inline=False)
-        # embed.set_footer(text="Gitara siema")
+        embed.add_field(name="Status", value=member.status, inline=False)
+        embed.add_field(name="Roles", value=" ".join(list(map(lambda x: x.mention, member.roles))[:0:-1]), inline=False)
+        embed.set_footer(text="Displayed time is in UTC")
         await ctx.send(embed=embed)
 
     @command()
@@ -46,33 +51,54 @@ class Main(commands.Cog):
 
     @command()
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member: discord.Member, *, reason=""):
-        if ctx.author.top_role > member.top_role:
-            reason = '{}: {}'.format(ctx.author.display_name, reason)
-            await ctx.guild.kick(member, reason=reason)
-            await ctx.send(f"{member.display_name} został wyrzucony z serwera")
-        else:
-            await ctx.send("Osoba którą chcesz kicknąć ma za wysoką rangę")
+    async def kick(self, ctx, members: commands.Greedy[discord.Member], *, reason=""):
+        for member in members:
+            if ctx.author.top_role > member.top_role:
+                reason = '{}: {}'.format(ctx.author.display_name, reason)
+                await ctx.guild.kick(member, reason=reason)
+                await ctx.send(f"{member.display_name} został wyrzucony z serwera")
+            else:
+                await ctx.send(f"Nie możesz kicknąć {member.display_name}, ponieważ ma za wysoką rangę")
 
     @command()
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member, *, reason=""):
-        if ctx.author.top_role > member.top_role:
-            reason = '{}: {}'.format(ctx.author.display_name, reason)
-            await ctx.guild.ban(member, reason=reason, delete_message_days = 0)
-            await ctx.send(f"{member.display_name} został zbanowany z serwera")
-        else:
-            await ctx.send("Osoba którą chcesz zbanować ma za wysoką rangę")
+    async def ban(self, ctx, members: commands.Greedy[discord.Member], *, reason=""):
+        for member in members:
+            if ctx.author.top_role > member.top_role:
+                reason = '{}: {}'.format(ctx.author.display_name, reason)
+                await ctx.guild.ban(member, reason=reason, delete_message_days = 0)
+                await ctx.send(f"{member.display_name} został zbanowany z serwera")
+            else:
+                await ctx.send(f"Nie możesz zbanować {member.display_name}, ponieważ ma za wysoką rangę")
 
-    @command(aliases=('logout',))
+    @command(aliases=('logout','kys'))
     async def stop(self, ctx):
         """Wyłącz bota xd"""
-        await self.bot.logout()
+        if ctx.guild.owner == ctx.author:
+            await ctx.send('No to ja spadam xD')
+            await self.bot.logout()
+        else:
+            await ctx.send('No na pewno xD')
+
+    @command()
+    async def test(self, ctx):
+        def check_func(message):
+            return message.content == "przestan" and message.channel == ctx.channel
+        while True:
+            print("xd")
+            try:
+                await self.bot.wait_for('message', timeout=1, check=check_func)
+            except asyncio.TimeoutError:
+                continue
+            else:
+                break
+        print('koniec')
 
     @command(aliases=('delete', 'usun', 'fetusdeletus', 'del', 'purge', 'clear'))
     @commands.has_permissions(manage_messages=True)
-    async def dele(self, ctx, times: try_convert = 0):
+    async def dele(self, ctx, times=''):
         """Usuń ileś tam wiadomości"""
+        times = try_convert(times, 1)
         limit = times + 2 if times <= 50 else 50
         await ctx.send("bedzie usuwanko")
         await asyncio.sleep(.5)
@@ -124,7 +150,7 @@ class Main(commands.Cog):
             print("{} powtarza {} - {} razy".format(ctx.author, "\"" + " ".join(content) + "\"", times))
             for i in range(times):
                 await ctx.send(" ".join(content))
-                await asyncio.sleep(1)
+                await asyncio.sleep(.5)
 
 
 def setup(bot):
