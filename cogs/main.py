@@ -1,10 +1,11 @@
 from discord.ext import commands
 from discord.ext.commands import command
 # import discord.Embed
-from manage_db import query_selectall
+from manage_db import query_selectall, query_select, query_insert
 import discord
 import random
 import asyncio
+import typing
 from time import strftime
 import time
 from functions import try_convert
@@ -20,17 +21,23 @@ class Main(commands.Cog):
 
     @command()
     async def info(self, ctx, member: discord.Member):
+        info_types = [
+            {'name': 'Display Name', 'value': member.display_name, 'inline': True},
+            {'name': 'Discriminator', 'value': member.discriminator, 'inline': True},
+            {'name': 'Created At', 'value': member.created_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
+            {'name': 'Joined At', 'value': member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
+            {'name': 'ID', 'value': member.id, 'inline': False},
+            {'name': 'Status', 'value': member.status, 'inline': False},
+            {'name': 'Roles', 'value': " ".join(list(map(lambda x: x.mention, member.roles))[:0:-1]), 'inline': False}
+        ]
         embed = discord.Embed(title="Info o gościu", colour=0x00ffff)
         embed.set_thumbnail(url=member.avatar_url)
         embed.set_author(name=member.display_name, icon_url=member.avatar_url)
 
-        embed.add_field(name="Display Name", value=member.display_name, inline=True)
-        embed.add_field(name="Discriminator", value=member.discriminator, inline=True)
-        embed.add_field(name="Created At", value=member.created_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
-        embed.add_field(name="Joined At", value=member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), inline=False)
-        embed.add_field(name="ID", value=member.id, inline=False)
-        embed.add_field(name="Status", value=member.status, inline=False)
-        embed.add_field(name="Roles", value=" ".join(list(map(lambda x: x.mention, member.roles))[:0:-1]), inline=False)
+        for types in info_types:
+            values = (ctx.guild.id, types['name'])
+            if not query_select('SELECT * FROM rules WHERE server = ? AND type="info_skip" AND info=?', values):
+                embed.add_field(name=types['name'], value=types['value'], inline=types['inline'])
         embed.set_footer(text="Displayed time is in UTC")
         await ctx.send(embed=embed)
 
@@ -71,7 +78,7 @@ class Main(commands.Cog):
             else:
                 await ctx.send(f"Nie możesz zbanować {member.display_name}, ponieważ ma za wysoką rangę")
 
-    @command(aliases=('logout','kys'))
+    @command(aliases=('logout', 'kys'))
     async def stop(self, ctx):
         """Wyłącz bota xd"""
         if ctx.guild.owner == ctx.author:
@@ -80,28 +87,14 @@ class Main(commands.Cog):
         else:
             await ctx.send('No na pewno xD')
 
-    @command()
-    async def test(self, ctx):
-        def check_func(message):
-            return message.content == "przestan" and message.channel == ctx.channel
-        while True:
-            print("xd")
-            try:
-                await self.bot.wait_for('message', timeout=1, check=check_func)
-            except asyncio.TimeoutError:
-                continue
-            else:
-                break
-        print('koniec')
-
     @command(aliases=('delete', 'usun', 'fetusdeletus', 'del', 'purge', 'clear'))
     @commands.has_permissions(manage_messages=True)
-    async def dele(self, ctx, times=''):
+    async def dele(self, ctx, times: typing.Optional[int] = 1):
         """Usuń ileś tam wiadomości"""
-        times = try_convert(times, 1)
-        limit = times + 2 if times <= 50 else 50
+        max_limit = 50
+        # TODO dele settings
+        limit = times + 2 if times <= max_limit else max_limit
         await ctx.send("bedzie usuwanko")
-        await asyncio.sleep(.5)
         await ctx.channel.purge(limit=limit)
 
     @command()
@@ -136,6 +129,7 @@ class Main(commands.Cog):
     @command()
     async def repeat(self, ctx, *content):
         """Powtórz wiadomość pare razy"""
+        # todo repeat settings
         if content:
             content = list(content)
             if len(content) >= 2:
@@ -150,7 +144,7 @@ class Main(commands.Cog):
             print("{} powtarza {} - {} razy".format(ctx.author, "\"" + " ".join(content) + "\"", times))
             for i in range(times):
                 await ctx.send(" ".join(content))
-                await asyncio.sleep(.5)
+                await asyncio.sleep(1)
 
 
 def setup(bot):

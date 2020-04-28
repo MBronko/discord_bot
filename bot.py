@@ -46,20 +46,4 @@ async def on_command(ctx):
     inf = (guild_name, channel_name, ctx.author.name + "#" + str(ctx.author.discriminator), ctx.message.content)
     query_insert('INSERT INTO logs (server, channel, user, command, time) values (?, ?, ?, ?, current_timestamp)', inf)
 
-
-@bot.event
-async def on_message(message):
-    # mlp = bot.get_guild(328935623144636426)
-    # emojis = list(mlp.emojis)
-    # cursedlist = [
-    #     'Miraś',
-    #     'Zbugowany',
-    #     'Ryear'
-    # ]
-    # if message.author.display_name in cursedlist:
-    #     random.shuffle(emojis)
-    #     for x in range(15):
-    #         await message.add_reaction(emojis[x])
-    await bot.process_commands(message)
-
 bot.run(token)

@@ -29,7 +29,7 @@ async def simple_get(url):
                 return await r.text()
 
 
-async def fetch_champions(ctx, times, lane='team', color=0xffffff):
+async def fetch_champions(ctx, times, lane, color):
     if not query_select('SELECT * from rules where type="lolchamps" and '
                         '(strftime("%s",current_timestamp)-strftime("%s",info)<60*60*24*7)'):
         print('pobieranie bazy danych')
@@ -62,7 +62,7 @@ async def fetch_champions(ctx, times, lane='team', color=0xffffff):
         champ_list = query_selectall('SELECT champ FROM lolchamps '
                                      'WHERE %s = ''"tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,), True)
         embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + icon_url_dict[lane])
-        embed.add_field(name='\u200b', value='/\u200b'.join(champ_list))
+        embed.add_field(name='\u200b', value='\n'.join(champ_list))
     else:
         lanes = ['top', 'jungle', 'middle', 'adc', 'support']
         used_champs = []

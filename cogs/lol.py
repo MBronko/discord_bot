@@ -4,6 +4,7 @@ import random
 from cogs.webscraping import fetch_champions
 from manage_db import query_insert
 from functions import try_convert
+import typing
 
 
 class LeagueOfLegends(commands.Cog):
@@ -11,34 +12,34 @@ class LeagueOfLegends(commands.Cog):
         self.bot = bot
 
     @command(aliases=('toplane',))
-    async def top(self, ctx, times=''):
+    async def top(self, ctx, times: typing.Optional[int] = 1):
         """Wylosuj sobie topa"""
-        await fetch_champions(ctx, try_convert(times, 1), "top", 0xCC0000)
+        await fetch_champions(ctx, times, "top", 0xCC0000)
 
     @command(aliases=('jgl',))
-    async def jungle(self, ctx, times=''):
+    async def jungle(self, ctx, times: typing.Optional[int] = 1):
         """Wylosuj sobie jungle"""
-        await fetch_champions(ctx, try_convert(times, 1), "jungle", 0x339933)
+        await fetch_champions(ctx, times, "jungle", 0x339933)
 
     @command(aliases=('middle', 'midlane'))
-    async def mid(self, ctx, times=''):
+    async def mid(self, ctx, times: typing.Optional[int] = 1):
         """Wylosuj sobie mida"""
-        await fetch_champions(ctx, try_convert(times, 1), "middle", 0xFFCC33)
+        await fetch_champions(ctx, times, "middle", 0xFFCC33)
 
     @command()
-    async def adc(self, ctx, times=''):
+    async def adc(self, ctx, times: typing.Optional[int] = 1):
         """Wylosuj sobie adc"""
-        await fetch_champions(ctx, try_convert(times, 1), "adc", 0x3399FF)
+        await fetch_champions(ctx, times, "adc", 0x3399FF)
 
     @command(aliases=('support',))
-    async def supp(self, ctx, times=''):
+    async def supp(self, ctx, times: typing.Optional[int] = 1):
         """Wylosuj sobie suppa"""
-        await fetch_champions(ctx, try_convert(times, 1), "support", 0xFF99FF)
+        await fetch_champions(ctx, times, "support", 0xFF99FF)
 
     @command()
-    async def team(self, ctx, times=''):
+    async def team(self, ctx, times: typing.Optional[int] = 1):
         """Wylosuj sobie cały team"""
-        await fetch_champions(ctx, try_convert(times, 1), 'team', 0xA652BB)
+        await fetch_champions(ctx, times, 'team', 0xA652BB)
 
     @command()
     async def resetdb(self, ctx):
@@ -48,7 +49,7 @@ class LeagueOfLegends(commands.Cog):
         await ctx.send("Odświeżam baze danych postaci z lola")
 
     @command()
-    async def tft(self, ctx, times: try_convert = 2):
+    async def tft(self, ctx, times: typing.Optional[int] = 2):
         types = ['Infiltrator', 'Sorcerer', 'Blademaster', 'Brawler', 'Mystic', 'Protector', 'Sniper', 'Blaster',
                  'Demolitionist', 'Mana-Reaver', 'Vanguard', 'Dark Star', 'Mech Pilot', 'Cybernetic', 'Star Guardian',
                  'Chrono', 'Celestial', 'Space Pirate', 'Void', 'Rebel']

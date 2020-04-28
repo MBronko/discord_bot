@@ -5,6 +5,7 @@ __pycache__/
 .idea/
 token.txt
 botdb.db
+for_later.py
 
 # C extensions
 *.so
