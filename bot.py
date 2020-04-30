@@ -13,7 +13,8 @@ initial_extensions = [
     'cogs.lol',
     'cogs.main',
     'cogs.settings',
-    'cogs.errorhandle'
+    'cogs.errorhandle',
+    'cogs.cahgame'
 ]
 
 description = 'No siemano tutej so komendy do bota i w ogóle, jeżeli zapomnisz prefixu to możesz też wywołać ' \
@@ -29,9 +30,14 @@ if __name__ == '__main__':
 
 
 @bot.event
+async def on_connect():
+    await bot.change_presence(status=discord.Status.invisible)
+
+
+@bot.event
 async def on_ready():
-    game = discord.Game("gituwa elo")
-    await bot.change_presence(activity=game)
+    # game = discord.Game("gituwa elo")
+    # await bot.change_presence(activity=game)
     print('Logged in as {}\n{}\n------'.format(bot.user.name, bot.user.id))
 
 

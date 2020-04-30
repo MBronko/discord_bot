@@ -13,13 +13,17 @@ def create_db():
         c = conn.cursor()
 
         c.execute('''CREATE TABLE rules
-                     (server TEXT, channel TEXT, user TEXT, type TEXT, info TEXT)''')
+                     (server TEXT, channel TEXT, user TEXT, type TEXT, value TEXT)''')
 
         c.execute('''CREATE TABLE logs
                      (user TEXT, server TEXT, channel TEXT, command TEXT, time TEXT)''')
 
         c.execute('''CREATE TABLE lolchamps
                      (champ TEXT, top TEXT, jungle TEXT, middle TEXT, adc TEXT, support TEXT)''')
+
+        c.execute('''CREATE TABLE cahgame
+                     (server TEXT, channel TEXT, user TEXT, game_id TEXT, round_id TEXT, type TEXT, flag TEXT, 
+                     value TEXT, time TEXT)''')
 
         conn.commit()
         conn.close()

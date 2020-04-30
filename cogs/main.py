@@ -20,26 +20,29 @@ class Main(commands.Cog):
         await ctx.send("henlo "+" ".join(map(lambda x: x.mention, members)))
 
     @command()
-    async def info(self, ctx, member: discord.Member):
-        info_types = [
-            {'name': 'Display Name', 'value': member.display_name, 'inline': True},
-            {'name': 'Discriminator', 'value': member.discriminator, 'inline': True},
-            {'name': 'Created At', 'value': member.created_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
-            {'name': 'Joined At', 'value': member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
-            {'name': 'ID', 'value': member.id, 'inline': False},
-            {'name': 'Status', 'value': member.status, 'inline': False},
-            {'name': 'Roles', 'value': " ".join(list(map(lambda x: x.mention, member.roles))[:0:-1]), 'inline': False}
-        ]
-        embed = discord.Embed(title="Info o gościu", colour=0x00ffff)
-        embed.set_thumbnail(url=member.avatar_url)
-        embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+    async def info(self, ctx, members: commands.Greedy[discord.Member], sink=''):
+        if not members and sink != '':
+            await ctx.send('Nie mogę znaleźć podanego użytkownika')
+        for member in members:
+            info_types = [
+                {'name': 'Display Name', 'value': member.display_name, 'inline': True},
+                {'name': 'Discriminator', 'value': member.discriminator, 'inline': True},
+                {'name': 'Created At', 'value': member.created_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
+                {'name': 'Joined At', 'value': member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
+                {'name': 'ID', 'value': member.id, 'inline': False},
+                {'name': 'Status', 'value': member.status, 'inline': False},
+                {'name': 'Roles', 'value': " ".join(list(map(lambda x: x.mention, member.roles))[:0:-1]), 'inline': False}
+            ]
+            embed = discord.Embed(title="Info o gościu", colour=0x00ffff)
+            embed.set_thumbnail(url=member.avatar_url)
+            embed.set_author(name=member.display_name, icon_url=member.avatar_url)
 
-        for types in info_types:
-            values = (ctx.guild.id, types['name'])
-            if not query_select('SELECT * FROM rules WHERE server = ? AND type="info_skip" AND info=?', values):
-                embed.add_field(name=types['name'], value=types['value'], inline=types['inline'])
-        embed.set_footer(text="Displayed time is in UTC")
-        await ctx.send(embed=embed)
+            for types in info_types:
+                values = (ctx.guild.id, types['name'])
+                if not query_select('SELECT * FROM rules WHERE server = ? AND type="info_skip" AND value=?', values):
+                    embed.add_field(name=types['name'], value=types['value'], inline=types['inline'])
+            embed.set_footer(text="Displayed time is in UTC")
+            await ctx.send(embed=embed)
 
     @command()
     async def mock(self, ctx, *, msg):
@@ -113,7 +116,8 @@ class Main(commands.Cog):
     @command(aliases=('siemano', 'hejka', 'czesc', 'witam'))
     async def eluwa(self, ctx):
         """Przywitaj się"""
-        await ctx.send('no siemano')
+        msg = await ctx.send('no siemano')
+        print(msg.id)
 
     @command()
     async def add(self, ctx, *numbers: try_convert):

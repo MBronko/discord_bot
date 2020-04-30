@@ -10,7 +10,7 @@ def get_prefix(bot, message):
     else:
         server_id = message.guild.id
         try:
-            prefix = query_select("SELECT info FROM rules WHERE server = ? AND type = 'prefix'", (server_id,))[0]
+            prefix = query_select("SELECT value FROM rules WHERE server = ? AND type = 'prefix'", (server_id,))[0]
         except TypeError:
             prefix = default_prefix
     return commands.when_mentioned_or(prefix)(bot, message)

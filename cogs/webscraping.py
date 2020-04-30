@@ -31,11 +31,11 @@ async def simple_get(url):
 
 async def fetch_champions(ctx, times, lane, color):
     if not query_select('SELECT * from rules where type="lolchamps" and '
-                        '(strftime("%s",current_timestamp)-strftime("%s",info)<60*60*24*7)'):
+                        '(strftime("%s",current_timestamp)-strftime("%s",value)<60*60*24*7)'):
         print('pobieranie bazy danych')
         query_insert('DELETE FROM rules where type="lolchamps"')
         query_insert('DELETE FROM "lolchamps"')
-        query_insert('INSERT INTO rules (type, info) values ("lolchamps", current_timestamp)')
+        query_insert('INSERT INTO rules (type, value) values ("lolchamps", current_timestamp)')
 
         html = BeautifulSoup(await simple_get(wiki_url), 'html.parser')
         the_table = html.find("table", class_="article-table sortable")
