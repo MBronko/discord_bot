@@ -1,5 +1,5 @@
 from discord.ext import commands
-from manage_db import query_select
+from dbwrapper import query_select
 
 default_prefix = ''
 

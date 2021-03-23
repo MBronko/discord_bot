@@ -1,7 +1,7 @@
 import sqlite3
 import os
 
-db_name = 'botdb.db'
+db_name = 'dcbot.db'
 
 
 def create_db():

@@ -1,10 +1,6 @@
-from requests import get
-from requests.exceptions import RequestException
-from contextlib import closing
 from bs4 import BeautifulSoup
-from manage_db import *
+from dbwrapper import *
 from discord import Embed
-import random
 import json
 import re
 import aiohttp

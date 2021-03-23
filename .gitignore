@@ -1,11 +1,12 @@
+# Custom
+token.txt
+dcbot.db
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 .idea/
-token.txt
-botdb.db
-for_later.py
 
 # C extensions
 *.so

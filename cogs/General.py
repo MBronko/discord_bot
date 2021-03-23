@@ -1,17 +1,15 @@
 from discord.ext import commands
 from discord.ext.commands import command
 # import discord.Embed
-from manage_db import query_selectall, query_select, query_insert
+from dbwrapper import query_selectall, query_select
 import discord
 import random
 import asyncio
 import typing
-from time import strftime
-import time
-from functions import try_convert
+from tools import try_convert
 
 
-class Main(commands.Cog):
+class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -152,4 +150,4 @@ class Main(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Main(bot))
+    bot.add_cog(General(bot))

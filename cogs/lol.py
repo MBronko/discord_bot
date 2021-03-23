@@ -2,8 +2,7 @@ from discord.ext import commands
 from discord.ext.commands import command
 import random
 from cogs.webscraping import fetch_champions
-from manage_db import query_insert
-from functions import try_convert
+from dbwrapper import query_insert
 import typing
 
 
