@@ -6,6 +6,7 @@ import discord
 import random
 import asyncio
 import typing
+import requests
 from tools import try_convert
 
 
@@ -15,7 +16,7 @@ class General(commands.Cog):
 
     @command()
     async def henlo(self, ctx, members: commands.Greedy[discord.Member]):
-        await ctx.send("henlo "+" ".join(map(lambda x: x.mention, members)))
+        await ctx.send("henlo "+" ".join([user.mention for user in members]))
 
     @command()
     async def info(self, ctx, members: commands.Greedy[discord.Member], sink=''):
@@ -116,6 +117,13 @@ class General(commands.Cog):
         """Przywitaj się"""
         msg = await ctx.send('no siemano')
         print(msg.id)
+
+    @command()
+    async def shorten(self, ctx, link):
+        error_msg = "Invalid URL"
+        r = requests.post("https://bronko.me", data={'shorten': link}).text.strip()
+        msg = f"<{r}>" if r != "Segmentation fault" else error_msg
+        await ctx.send(msg)
 
     @command()
     async def add(self, ctx, *numbers: try_convert):

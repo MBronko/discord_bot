@@ -11,9 +11,6 @@ bot = commands.Bot(command_prefix=get_prefix, description=DESCRIPTION, owner_id=
 for extension in initial_extensions:
     bot.load_extension(extension)
 
-# @bot.event
-# async def on_connect():
-
 
 @bot.event
 async def on_ready():
@@ -30,5 +27,6 @@ async def on_command(ctx):
         channel_name = ""
     inf = (guild_name, channel_name, ctx.author.name + "#" + str(ctx.author.discriminator), ctx.message.content)
     query_insert('INSERT INTO logs (server, channel, user, command, time) values (?, ?, ?, ?, current_timestamp)', inf)
+
 
 bot.run(open('token.txt').readline().strip('\n'))
