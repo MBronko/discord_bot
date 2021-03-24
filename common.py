@@ -4,6 +4,7 @@ initial_extensions = [
     'cogs.lol',
     'cogs.General',
     'cogs.Settings',
+    'cogs.Voice',
     'cogs.ErrorHandler'
 ]
 

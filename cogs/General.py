@@ -80,14 +80,14 @@ class General(commands.Cog):
             else:
                 await ctx.send(f"Nie możesz zbanować {member.display_name}, ponieważ ma za wysoką rangę")
 
-    @command(aliases=('logout', 'kys'))
-    async def stop(self, ctx):
-        """Wyłącz bota xd"""
-        if ctx.guild.owner == ctx.author:
-            await ctx.send('No to ja spadam xD')
-            await self.bot.logout()
-        else:
-            await ctx.send('No na pewno xD')
+    # @command(aliases=('logout', 'kys'))
+    # async def stop(self, ctx):
+    #     """Wyłącz bota xd"""
+    #     if ctx.guild.owner == ctx.author:
+    #         await ctx.send('No to ja spadam xD')
+    #         await self.bot.logout()
+    #     else:
+    #         await ctx.send('No na pewno xD')
 
     @command(aliases=('delete', 'usun', 'fetusdeletus', 'del', 'purge', 'clear'))
     @commands.has_permissions(manage_messages=True)
@@ -139,22 +139,21 @@ class General(commands.Cog):
     @command()
     async def repeat(self, ctx, *content):
         """Powtórz wiadomość pare razy"""
-        # todo repeat settings
+        content = list(content)
+        try:
+            popped = int(content[-1])
+            times = popped if popped < 3 else 3
+            content.pop()
+        except Exception:
+            times = 1
         if content:
-            content = list(content)
-            if len(content) >= 2:
-                try:
-                    popped = int(content[-1])
-                    times = popped if popped <= 20 else 20
-                    content.pop()
-                except ValueError:
-                    times = 1
-            else:
-                times = 1
-            print("{} powtarza {} - {} razy".format(ctx.author, "\"" + " ".join(content) + "\"", times))
+            content_str = " ".join(content)
+            print("{} powtarza {} - {} razy".format(ctx.author, "\"" + content_str + "\"", times))
             for i in range(times):
-                await ctx.send(" ".join(content))
+                await ctx.send(content_str)
                 await asyncio.sleep(1)
+        else:
+            await ctx.send("Empty message")
 
 
 def setup(bot):
