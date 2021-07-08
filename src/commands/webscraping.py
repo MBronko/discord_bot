@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from dbwrapper import *
+from src.dbwrapper import *
 from discord import Embed
 import json
 import re

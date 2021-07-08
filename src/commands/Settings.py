@@ -1,6 +1,5 @@
 from discord.ext import commands
-from tools import get_prefix
-from dbwrapper import query_select, query_insert
+from src.utils.tools import get_prefix
 from discord import Embed
 
 

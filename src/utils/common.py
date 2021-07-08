@@ -1,0 +1,8 @@
+# 328935623144636426 mlp id
+
+DESCRIPTION = 'Discord Bot Under Development'
+
+OWNER_ID = 322414584256266240
+
+DEFAULT_PREFIX = ""
+

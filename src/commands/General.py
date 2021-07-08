@@ -1,13 +1,13 @@
 from discord.ext import commands
 from discord.ext.commands import command
 # import discord.Embed
-from dbwrapper import query_selectall, query_select
+from src.dbwrapper import query_selectall, query_select
 import discord
 import random
 import asyncio
 import typing
 import requests
-from tools import try_convert
+from src.utils.tools import try_convert
 
 
 class General(commands.Cog):

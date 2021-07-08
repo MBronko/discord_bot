@@ -1,18 +1,16 @@
 from discord.ext import commands
-from dbwrapper import query_select
-
-default_prefix = ''
+from src.utils.models import Session, Settings
+from src.utils.common import DEFAULT_PREFIX
 
 
 def get_prefix(bot, message):
     if message.guild is None:
-        prefix = default_prefix
+        prefix = DEFAULT_PREFIX
     else:
-        server_id = message.guild.id
-        try:
-            prefix = query_select("SELECT value FROM rules WHERE server = ? AND type = 'prefix'", (server_id,))[0]
-        except TypeError:
-            prefix = default_prefix
+        with Session() as session:
+            rule = session.query(Settings).where(Settings.server == message.guild.id, Settings.type == "prefix").first()
+            prefix = rule.value if rule else DEFAULT_PREFIX
+
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
