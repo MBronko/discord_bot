@@ -1,8 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import command
 import random
-from src.commands.webscraping import fetch_champions
-from src.dbwrapper import query_insert
+from src.utils.webscraping import fetch_champions
 import typing
 
 

@@ -5,8 +5,10 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-class Settings(Base):
-    __tablename__ = "settings"
+
+# basically just settings for each server
+class Rules(Base):
+    __tablename__ = "rules"
 
     id = Column("id", Integer, primary_key=True)
     server = Column("server", Integer, default="")
@@ -17,6 +19,7 @@ class Settings(Base):
     timestamp = Column("timestamp", TIMESTAMP, server_default=func.now())
 
 
+# store league of legends champions info
 class Leaguechamps(Base):
     __tablename__ = "leaguechamps"
 
@@ -29,36 +32,6 @@ class Leaguechamps(Base):
     support = Column("support", Boolean, default=False)
 
 
-# class Logs(Base):
-#     __tablename__ = "logs"
-#
-#     id = Column("id", Integer, primary_key=True)
-#     server = Column("server", Integer)
-#     channel = Column("channel", Integer)
-#     user = Column("user", Integer)
-#     command = Column("command", String)
-#     timestamp = Column("timestamp", TIMESTAMP, server_default=func.now())
-
-print("test")
-test = "asd"
 engine = create_engine('sqlite:///../dcbot.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(engine)
-# name = ["test7", "test", "broken"]
-
-# with Session() as session:
-#     new_champ = Leaguechamps()
-#     new_champ.top = True
-#     new_champ.name = name
-#     new_champ.support = True
-#
-#     session.add(new_champ)
-#     session.commit()
-
-# with Session() as session:
-    # for champ in session.query(Leaguechamps).filter(Leaguechamps.name.not_in(name)):
-    #     print(f"{champ.name}")
-
-
-
-        # print(f"{champ.id} {champ.name} {champ.top} {champ.jungle} {champ.mid} {champ.adc} {champ.support}")

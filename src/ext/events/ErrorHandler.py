@@ -14,13 +14,13 @@ class CommandErrorHandler(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
 
-        # commands.UserInputError
+        # ext.UserInputError
         ignored = (commands.CommandNotFound,)
         error = getattr(error, 'original', error)
         if isinstance(error, ignored):
             return
 
-        # Disabled commands
+        # Disabled ext
         elif isinstance(error, commands.DisabledCommand):
             return await ctx.send(f'Komenda {ctx.command} została wyłączona.')
 

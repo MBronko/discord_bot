@@ -15,7 +15,6 @@ class Events(Cog):
         try:
             guild_name = ctx.guild.name
             channel_name = ctx.channel.name
-            print(f"{guild_name}, {channel_name}, {ctx.author.name}")
         except AttributeError:
             guild_name = ""
             channel_name = ""
