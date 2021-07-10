@@ -16,7 +16,7 @@ class Users(commands.Cog):
                 await ctx.guild.kick(member, reason=reason)
                 await ctx.send(f"{member.display_name} został wyrzucony z serwera")
             else:
-                await ctx.send(f"Nie możesz kicknąć {member.display_name}, ponieważ ma za wysoką rangę")
+                await ctx.send(f'You cant kick {member.display_name}')
 
     @command()
     @commands.has_permissions(ban_members=True)
@@ -25,9 +25,9 @@ class Users(commands.Cog):
             if ctx.author.top_role > member.top_role:
                 reason = '{}: {}'.format(ctx.author.display_name, reason)
                 await ctx.guild.ban(member, reason=reason, delete_message_days=0)
-                await ctx.send(f"{member.display_name} został zbanowany z serwera")
+                await ctx.send(f'{member.display_name} was banned from the server')
             else:
-                await ctx.send(f"Nie możesz zbanować {member.display_name}, ponieważ ma za wysoką rangę")
+                await ctx.send(f'You cant ban {member.display_name}')
 
 
 def setup(bot):

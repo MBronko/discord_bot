@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord import Embed
-from src.utils.models import Session, Rules
-from src.utils.common import PREFIX_BLACKLIST
+from src.utils.Models import Session, Rules
+from src.utils.Common import PREFIX_BLACKLIST
 
 
 class Settings(commands.Cog):
@@ -22,11 +22,11 @@ class Settings(commands.Cog):
         ]
         if not ctx.invoked_subcommand:
             embed = Embed(description='Change bot settings here')
-            
+
             embed.set_author(name='Mimi mentor settings', icon_url=self.bot.user.avatar_url)
             for setting in settings_list:
                 embed.add_field(name=setting[0], value=f"`{ctx.prefix}settings {setting[1]}`")
-                
+
             await ctx.send(embed=embed)
 
     @settings.command(alias='pref')

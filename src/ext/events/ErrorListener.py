@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog
 from discord.ext import commands
-from src.utils.common import DEBUG
+from src.utils.Common import DEBUG
 import traceback
 import sys
 
@@ -11,15 +11,14 @@ class CommandErrorHandler(Cog):
 
     @Cog.listener()
     async def on_command_error(self, ctx, error):
+        if hasattr(ctx.command, 'on_error'):
+            return
+
         if DEBUG:
             print(f'Exception \'{error}\' in \'{ctx.command}\' command', file=sys.stderr)
 
-        # if hasattr(ctx.command, 'on_error'):
-        #     return
-
-        # print(error, file=sys.stderr)
         ignored = (commands.CommandNotFound,)
-        # error = getattr(error, 'original', error)
+
         if isinstance(error, ignored):
             return
 
@@ -29,17 +28,8 @@ class CommandErrorHandler(Cog):
         if isinstance(error, commands.NoPrivateMessage):
             return await ctx.author.send('This command cannot be used in private message')
 
-        # if isinstance(error, commands.BadArgument):
-        #     get_member = [
-        #         'avatar',
-        #         'kick',
-        #         'ban'
-        #     ]
-        #     if ctx.command.qualified_name in get_member:
-        #         msg = 'Cant find specified user'
-        #     else:
-        #         msg = 'Error: BadArgument'
-        #     return await ctx.send(msg)
+        if isinstance(error, commands.BadArgument):
+            return await ctx.send('Error: BadArgument')
 
         if isinstance(error, commands.MissingPermissions):
             return await ctx.send('You dont have permissions to use this command')

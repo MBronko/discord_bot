@@ -13,8 +13,26 @@ class Random(commands.Cog):
         if choices:
             await ctx.send(random.choice(choices))
 
+    @command(aliases=('subset',))
+    async def sample(self, ctx, *choices: str):
+        """Get a random subset"""
+        length = len(choices)
+        if length == 0:
+            return await ctx.send(f'{ctx.prefix}sample \'set of choices\' [size of subset]')
+        if length == 1:
+            return await ctx.send(choices[0])
+        try:
+            n = int(choices[-1])
+            n = min(length - 1, n)
+            n = max(n, 1)
+            choices = choices[:-1]
+        except ValueError:
+            n = 1
+        await ctx.send(' '.join(random.sample(choices, n)))
+
     @command()
     async def rng(self, ctx, min_val=0, max_val=10):
+        """Get a random number in bounds"""
         try:
             min_val = int(min_val)
         except ValueError:
@@ -23,6 +41,9 @@ class Random(commands.Cog):
             max_val = int(max_val)
         except ValueError:
             max_val = 10
+
+        if min_val > max_val:
+            min_val, max_val = max_val, min_val
         await ctx.send(random.randint(min_val, max_val))
 
     @command()

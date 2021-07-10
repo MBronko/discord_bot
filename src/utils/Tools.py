@@ -1,6 +1,6 @@
 from discord.ext import commands
-from src.utils.models import Session, Rules
-from src.utils.common import DEFAULT_PREFIX, DEBUG
+from src.utils.Models import Session, Rules
+from src.utils.Common import DEFAULT_PREFIX, DEBUG
 import os
 
 

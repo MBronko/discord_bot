@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import command
-from src.utils.convert import convert_default
+from src.utils.Convert import convert_default
+from src.utils.Common import MAX_REPEAT
 from discord import Embed
 import requests
 
@@ -40,7 +41,7 @@ class General(commands.Cog):
 
     @command()
     async def avatar(self, ctx):
-        """Ukradnij komuś avatarek"""
+        """Show avatar of specified user"""
         for user in ctx.message.mentions:
             embed = Embed()
             embed.set_author(name=user.display_name, url=user.avatar_url)
@@ -49,15 +50,17 @@ class General(commands.Cog):
 
     @command(aliases=('siemano', 'eluwa'))
     async def hello(self, ctx):
-        """Przywitaj się"""
+        """Say henlo"""
         await ctx.send('henlo')
 
     @command()
     async def gitara(self, ctx):
+        """Siema"""
         await ctx.send('siema')
 
     @command(aliases=('link',))
     async def shorten(self, ctx, link):
+        """Shorten your link"""
         r = requests.post("https://bronko.me", data={'shorten': link}).text.strip()
         msg = f"<{r}>" if r != "Segmentation fault" else "Invalid URL"
         await ctx.send(msg)
@@ -69,23 +72,23 @@ class General(commands.Cog):
 
     @command()
     async def repeat(self, ctx, *content: str):
-        """Powtórz wiadomość pare razy"""
+        """Repeat message a number of times"""
         length = len(content)
         if length == 0:
-            await ctx.send(f'{ctx.prefix}repeat `message` [times]')
-        elif length == 1:
-            await ctx.send(content[0])
-        else:
-            try:
-                times = int(content[-1])
-                times = times if times < 10 else 10
-                content_str = " ".join(content[:-1])
-            except ValueError:
-                times = 1
-                content_str = " ".join(content)
+            return await ctx.send(f'{ctx.prefix}repeat `message` [times]')
+        if length == 1:
+            return await ctx.send(content[0])
 
-            for i in range(times):
-                await ctx.send(content_str)
+        try:
+            times = int(content[-1])
+            times = times if times < MAX_REPEAT else MAX_REPEAT
+            content_str = " ".join(content[:-1])
+        except ValueError:
+            times = 1
+            content_str = " ".join(content)
+
+        for i in range(times):
+            await ctx.send(content_str)
 
 
 def setup(bot):

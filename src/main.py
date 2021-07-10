@@ -1,9 +1,9 @@
 from discord.ext.commands import Bot
-from src.utils.common import DESCRIPTION, OWNER_ID
-from utils.tools import get_prefix, get_extensions
+from src.utils.Common import DESCRIPTION, OWNER_ID
+from utils.Tools import get_prefix, get_extensions
 
 
-bot = Bot(command_prefix=get_prefix, description=DESCRIPTION, owner_id=OWNER_ID)
+bot = Bot(command_prefix=get_prefix, description=DESCRIPTION, owner_id=OWNER_ID, bot=False)
 
 for extension in get_extensions():
     bot.load_extension(extension)

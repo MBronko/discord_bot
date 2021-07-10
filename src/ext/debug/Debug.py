@@ -1,10 +1,11 @@
 from discord.ext import commands
 from discord.ext.commands import command, errors
-from src.utils.tools import get_extensions
-from src.utils.models import Session, Rules, Leaguechamps
+from src.utils.Tools import get_extensions
+from src.utils.Models import Session, Rules, Leaguechamps
 
 
 class Debug(commands.Cog):
+    """DEBUG"""
     def __init__(self, bot):
         self.bot = bot
 
@@ -37,9 +38,8 @@ class Debug(commands.Cog):
     @command()
     @commands.is_owner()
     async def stop(self, ctx):
-        if ctx.guild.owner == ctx.author:
-            await ctx.send('Bye')
-            await self.bot.logout()
+        await ctx.send('Bye')
+        await self.bot.close()
 
 
 def setup(bot):
