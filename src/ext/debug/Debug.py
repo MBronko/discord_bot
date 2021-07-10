@@ -9,6 +9,7 @@ class Debug(commands.Cog):
         self.bot = bot
 
     @command()
+    @commands.is_owner()
     async def reload(self, ctx):
         to_reload = get_extensions()
         to_unload = [key for key in self.bot.extensions.keys() if key not in to_reload]
@@ -24,13 +25,21 @@ class Debug(commands.Cog):
         await ctx.send("Reloaded extensions")
 
     @command()
-    async def clear(self, ctx):
+    @commands.is_owner()
+    async def cleardb(self, ctx):
         with Session() as session:
             session.query(Rules).delete()
             session.query(Leaguechamps).delete()
             session.commit()
         print("Cleared database")
         await ctx.send("Cleared database")
+
+    @command()
+    @commands.is_owner()
+    async def stop(self, ctx):
+        if ctx.guild.owner == ctx.author:
+            await ctx.send('Bye')
+            await self.bot.logout()
 
 
 def setup(bot):

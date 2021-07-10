@@ -12,6 +12,7 @@ class Settings(commands.Cog):
     @commands.group()
     @commands.guild_only()
     async def settings(self, ctx):
+        """Change bot settings"""
         settings_list = [
             ('Prefix', 'prefix'),
             ('Info', 'info'),
@@ -32,10 +33,10 @@ class Settings(commands.Cog):
 
     @settings.command(alias='pref')
     async def prefix(self, ctx, new_prefix=None):
-
+        """Set prefix to address bot"""
         if new_prefix is None:
-            prefix = get_prefix(self.bot, ctx)[-1]
-            embed = Embed(description='Change prefix to address bot ext')
+            prefix = get_prefix(self.bot, ctx, with_mention=False)
+            embed = Embed(description='Set prefix to address bot')
             embed.set_author(name=f'{self.bot.user.name} settings', icon_url=self.bot.user.avatar_url)
             embed.add_field(name='Actual prefix', value=f'`{prefix}`', inline=False)
             embed.add_field(name='Usage', value=f'`{prefix}settings prefix [new prefix]`')
