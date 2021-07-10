@@ -1,10 +1,8 @@
 from discord.ext import commands
 from discord.ext.commands import command
-# import discord.Embed
-import discord
-import requests
 from src.utils.convert import convert_default
-from src.utils.tools import get_prefix
+from discord import Embed
+import requests
 
 
 class General(commands.Cog):
@@ -12,51 +10,42 @@ class General(commands.Cog):
         self.bot = bot
 
     @command()
-    async def info(self, ctx, members: commands.Greedy[discord.Member], sink=None):
+    async def info(self, ctx):
         """Show info about users"""
-        if not members and sink is not None:
-            await ctx.send('Cant find specified user')
-        for member in members:
+        for user in ctx.message.mentions:
             info_types = [
-                {'name': 'Display Name', 'value': member.display_name, 'inline': True},
-                {'name': 'Discriminator', 'value': member.discriminator, 'inline': True},
-                {'name': 'Created At', 'value': member.created_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
-                {'name': 'Joined At', 'value': member.joined_at.strftime("%Y-%m-%d %H:%M:%S"), 'inline': False},
-                {'name': 'ID', 'value': member.id, 'inline': False},
-                {'name': 'Status', 'value': member.status, 'inline': False},
-                {'name': 'Roles', 'value': " ".join([x.mention for x in member.roles][:0:-1]), 'inline': False}
+                ['Display Name', user.display_name, True],
+                ['Discriminator', user.discriminator, True],
+                ['Created At', user.created_at.strftime('%Y-%m-%d %H:%M:%S'), False],
+                ['Joined At', user.joined_at.strftime('%Y-%m-%d %H:%M:%S'), False],
+                ['ID', user.id, False],
+                ['Status', user.status, False],
+                ['Roles', ' '.join([x.mention for x in user.roles][1:]), False]
             ]
-            embed = discord.Embed(title="Info o gościu", colour=0x00ffff)
-            embed.set_thumbnail(url=member.avatar_url)
-            embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+            embed = Embed(title="User info", color=0x00ffff)
+            embed.set_thumbnail(url=user.avatar_url)
+            embed.set_author(name=user.display_name, icon_url=user.avatar_url)
 
             for types in info_types:
-                embed.add_field(name=types['name'], value=types['value'], inline=types['inline'])
-            embed.set_footer(text="Displayed time is in UTC")
+                embed.add_field(name=types[0], value=types[1], inline=types[2])
+            embed.set_footer(text="UTC time zone was used in timestamps")
             await ctx.send(embed=embed)
 
     @command()
     async def mock(self, ctx, *, msg):
-        """tOtAlNiE nIe MaM pOjEcIa Co To RoBi"""
-        mock = ''
-        upper = False
-        for letter in msg:
-            if upper:
-                mock += letter.upper()
-            else:
-                mock += letter.lower()
-            if letter != " ":
-                upper = not upper
+        """Mock sentence lIkE tHiS"""
         await ctx.message.delete()
-        await ctx.send(mock)
+        # TODO Create spongebob meme
+        await ctx.send(''.join([elem.upper() if idx % 2 else elem.lower() for idx, elem in enumerate(msg)]))
 
     @command()
-    async def avatar(self, ctx, member: discord.Member):
+    async def avatar(self, ctx):
         """Ukradnij komuś avatarek"""
-        embed = discord.Embed()
-        embed.set_author(name=member.display_name, url=member.avatar_url)
-        embed.set_image(url=member.avatar_url)
-        await ctx.send(embed=embed)
+        for user in ctx.message.mentions:
+            embed = Embed()
+            embed.set_author(name=user.display_name, url=user.avatar_url)
+            embed.set_image(url=user.avatar_url)
+            await ctx.send(embed=embed)
 
     @command(aliases=('siemano', 'eluwa'))
     async def hello(self, ctx):
@@ -83,7 +72,7 @@ class General(commands.Cog):
         """Powtórz wiadomość pare razy"""
         length = len(content)
         if length == 0:
-            await ctx.send(f'{get_prefix(self.bot, ctx, with_mention=False)}repeat `message` [times]')
+            await ctx.send(f'{ctx.prefix}repeat `message` [times]')
         elif length == 1:
             await ctx.send(content[0])
         else:

@@ -4,7 +4,7 @@ from src.utils.common import DEFAULT_PREFIX, DEBUG
 import os
 
 
-def get_prefix(bot, message, with_mention=True):
+def get_prefix(bot, message):
     if message.guild is None:
         prefix = DEFAULT_PREFIX
     else:
@@ -12,10 +12,7 @@ def get_prefix(bot, message, with_mention=True):
             rule = session.query(Rules).where(Rules.server == message.guild.id, Rules.type == 'prefix').first()
             prefix = rule.value if rule else DEFAULT_PREFIX
 
-    if with_mention:
-        return commands.when_mentioned_or(prefix)(bot, message)
-    else:
-        return prefix
+    return commands.when_mentioned_or(prefix)(bot, message)
 
 
 def get_extensions():

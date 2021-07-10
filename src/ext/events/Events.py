@@ -8,19 +8,19 @@ class Events(Cog):
 
     @Cog.listener()
     async def on_ready(self):
-        print('------\nLogged in as {}\n{}\n------'.format(self.bot.user.name, self.bot.user.id))
+        print(f'------\nLogged in as {self.bot.user.name}\n{self.bot.user.id}\n------')
 
     @Cog.listener()
     async def on_command(self, ctx):
-        try:
-            guild_name = ctx.guild.name
-            channel_name = ctx.channel.name
-        except AttributeError:
-            guild_name = ""
-            channel_name = ""
-
         with open('../logs.txt', 'a') as file:
-            file.write(f"{datetime.now()};{ctx.author.name}#{ctx.author.discriminator};{guild_name};{channel_name};{ctx.message.content}\n")
+            to_log = [
+                datetime.now(),
+                ctx.author,
+                ctx.guild,
+                ctx.channel,
+                ctx.message.content
+            ]
+            file.write(';'.join([str(x) for x in to_log]) + '\n')
 
 
 def setup(bot):
