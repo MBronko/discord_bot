@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord.ext.commands import command
-from src.utils.LeagueWebScraping import display_champions, fetch_champions, fetch_urls
+from src.utils.LeagueWebScraping import display_champions, fetch_champions, fetch_data
 from src.utils.Convert import convert_default
 from src.utils.Models import Session, Leaguechamps, Rules
 
@@ -46,6 +46,7 @@ class Leagueroll(commands.Cog):
     @command()
     async def refresh(self, ctx):
         """Refresh champion database"""
+        fetch_urls = [data[0] for data in fetch_data]
         msg = 'Champions database was refreshed\nUsed sites:\n<{}>'.format('>\n<'.join(fetch_urls))
         if await fetch_champions(ctx):
             await ctx.send(msg)
