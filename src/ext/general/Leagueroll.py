@@ -1,6 +1,6 @@
 from discord.ext import commands
 from discord.ext.commands import command
-from src.utils.LeagueWebScraping import display_champions, fetch_champions, fetch_data
+from utils.LeagueWebScraping import display_champions, fetch_champions, fetch_data
 
 
 class Leagueroll(commands.Cog):

@@ -1,6 +1,5 @@
 from discord import Embed
-from src.utils.Models import Session, Rules, Leaguechamps
-from src.utils.Convert import convert_default
+from utils.Models import Session, Rules, Leaguechamps
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from sqlalchemy import func

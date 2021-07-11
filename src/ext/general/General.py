@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import command
-from src.utils.Convert import convert_default
-from src.utils.Common import MAX_REPEAT
+from utils.Convert import convert_default
+from utils.Common import MAX_REPEAT
 from discord import Embed
 import requests
 

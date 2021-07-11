@@ -1,6 +1,6 @@
 from discord.ext.commands import Cog
 from discord.ext import commands
-from src.utils.Common import DEBUG
+from utils.Common import DEBUG
 import traceback
 import sys
 

@@ -1,6 +1,6 @@
 from discord.ext import commands
-from src.utils.Models import Session, Rules
-from src.utils.Common import DEFAULT_PREFIX, DEBUG
+from utils.Models import Session, Rules
+from utils.Common import DEFAULT_PREFIX, DEBUG
 import os
 
 
@@ -17,9 +17,9 @@ def get_prefix(bot, message):
 
 def get_extensions():
     ext = []
-    for root, directories, files in os.walk('ext'):
+    for root, directories, files in os.walk('src/ext'):
         if DEBUG or 'debug' not in root:
-            new_root = 'src.' + root.replace('/', '.')
+            new_root = '.'.join(root.split('/')[1:])
             for file in files:
                 if file.endswith('.py') and not file.startswith('Template'):
                     ext.append(f'{new_root}.{file[:-3]}')

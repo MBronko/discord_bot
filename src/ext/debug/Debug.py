@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import command, errors
-from src.utils.Tools import get_extensions
-from src.utils.Models import Session, Rules, Leaguechamps
+from utils.Tools import get_extensions
+from utils.Models import Session, Rules, Leaguechamps
 
 
 class Debug(commands.Cog):

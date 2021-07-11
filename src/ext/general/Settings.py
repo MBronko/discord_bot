@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord import Embed
-from src.utils.Models import Session, Rules
-from src.utils.Common import PREFIX_BLACKLIST
+from utils.Models import Session, Rules
+from utils.Common import PREFIX_BLACKLIST
 
 
 class Settings(commands.Cog):
