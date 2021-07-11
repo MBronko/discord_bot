@@ -9,5 +9,5 @@ for extension in get_extensions():
     bot.load_extension(extension)
 
 
-token = open('../token.txt').readline().strip('\n')
+token = open('token.txt').readline().strip('\n')
 bot.run(token)

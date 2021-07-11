@@ -32,6 +32,6 @@ class Leaguechamps(Base):
     support = Column("support", Boolean, default=False)
 
 
-engine = create_engine('sqlite:///../dcbot.db')
+engine = create_engine('sqlite:///dcbot.db')
 Base.metadata.create_all(engine)
 Session = sessionmaker(engine)
