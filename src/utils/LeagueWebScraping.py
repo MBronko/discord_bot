@@ -1,36 +1,35 @@
-# from discord import Embed
-# from sqlalchemy import func
+from discord import Embed
 from src.utils.Models import Session, Rules, Leaguechamps
-from sqlalchemy import func
+from src.utils.Convert import convert_default
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
-# import json
-import re
+from sqlalchemy import func
 import requests
+
+lane_info = {
+    'top': {'icon_name': 'e/ef/Top_icon.png', 'db_field': Leaguechamps.top},
+    'jungle': {'icon_name': '1/1b/Jungle_icon.png', 'db_field': Leaguechamps.jungle},
+    'mid': {'icon_name': '9/98/Middle_icon.png', 'db_field': Leaguechamps.mid},
+    'adc': {'icon_name': '9/97/Bottom_icon.png', 'db_field': Leaguechamps.adc},
+    'support': {'icon_name': 'e/e0/Support_icon.png', 'db_field': Leaguechamps.support}
+}
 
 wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions_by_draft_position'
 gg_url = 'https://champion.gg/statistics/?league=plat'
 
 icon_url_prefix = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/'
-icon_url_dict = {
+icon_names = {
     'top': 'e/ef/Top_icon.png',
     'jungle': '1/1b/Jungle_icon.png',
-    'middle': '9/98/Middle_icon.png',
+    'mid': '9/98/Middle_icon.png',
     'adc': '9/97/Bottom_icon.png',
     'support': 'e/e0/Support_icon.png'
 }
-lanes = [
-    'top',
-    'jungle',
-    'mid',
-    'adc',
-    'support'
-]
 team_icon_url = 'https://cdn.discordapp.com/attachments/702124910981415005/704348781965213746/gotawamapa.png'
 
-hours_cd = 0
+hours_cd = 12
 minutes_cd = 0
-seconds_cd = 5
+seconds_cd = 0
 
 db_identifier = 'lolchamps'
 
@@ -42,11 +41,11 @@ async def parse_lolwiki(html):
     for row in table.find_all('tr')[1:]:  # iterate over all positions in table
         champ_data = {'name': row.find('td').text.strip()}
 
+        lanes = list(lane_info.keys())
         for idx, td in enumerate(row.find_all('td')[1:-1]):
             champ_data[lanes[idx]] = bool(td.find_all())  # or td.text.strip() != '' # to include op.gg suggestions
         result.append(champ_data)
-    return [{'name': 'test', 'top': False, 'jungle': False, 'mid': True, 'adc': True, 'support': True}]
-    # return result
+    return result
 
 
 async def parse_gg(html):
@@ -61,7 +60,7 @@ async def parse_gg(html):
         if name not in buffer:
             buffer[name] = {'name': name, 'top': False, 'jungle': False, 'mid': False, 'adc': False, 'support': False}
 
-        href = row.find('a', class_='champion-tier-container')['href']
+        href = row.find('a', class_='champion-tier-container')['href']  # href looks like '/champion/Kassadin/Middle'
         lane = href.split('/')[-1].lower()
         lane = lane if lane != 'middle' else 'mid'
 
@@ -82,13 +81,14 @@ async def request_and_parse(ctx, url, callback):
 
 async def update_database(champions):
     if champions:
-        for champion in champions:
-            with Session() as session:
+        bulk_save = []
+        with Session() as session:
+            for champion in champions:
                 db_champ = session.query(Leaguechamps).where(Leaguechamps.name == champion['name']).first()
                 if not db_champ:
                     db_champ = Leaguechamps()
                     db_champ.name = champion['name']
-                    session.add(db_champ)
+                    bulk_save.append(db_champ)
 
                 db_champ.top = db_champ.top or champion['top']
                 db_champ.jungle = db_champ.jungle or champion['jungle']
@@ -96,7 +96,8 @@ async def update_database(champions):
                 db_champ.adc = db_champ.adc or champion['adc']
                 db_champ.support = db_champ.support or champion['support']
 
-                session.commit()
+            session.bulk_save_objects(bulk_save)
+            session.commit()
 
 
 async def fetch_champions(ctx):
@@ -130,7 +131,7 @@ async def fetch_champions(ctx):
     return False
 
 
-async def display_champions(ctx, lane, times, color):
+async def display_champions(ctx, times, lane, color):
     # check if update is needed
     with Session() as session:
         last_time = datetime.utcnow() - timedelta(hours=hours_cd, minutes=minutes_cd, seconds=seconds_cd)
@@ -138,24 +139,31 @@ async def display_champions(ctx, lane, times, color):
         if not res:
             await fetch_champions(ctx)
 
-    await ctx.send('tu championy beda')
+    try:
+        times = int(times)
+    except ValueError:
+        times = 1
+    if times < 1:
+        times = 1
 
-    # TODO display champions for lane
-#     embed = Embed(color=color)
-#     if lane != 'team':
-#         champ_list = query_selectall('SELECT champ FROM lolchamps '
-#                                      'WHERE %s = ''"tak" ORDER BY RANDOM() LIMIT ?' % lane, (times,), True)
-#         embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + icon_url_dict[lane])
-#         embed.add_field(name='\u200b', value='\n'.join(champ_list))
-#     else:
-#         lanes = ['top', 'jungle', 'middle', 'adc', 'support']
-#         used_champs = []
-#         embed.set_author(name=lane.capitalize(), icon_url=team_icon_url)
-#         for lane in lanes:
-#             args = used_champs + list((times,))
-#             sql = 'SELECT champ FROM lolchamps WHERE %s="tak" ' \
-#                   'AND champ not in (%s) ORDER BY RANDOM() LIMIT ?' % (lane, ','.join(['?'] * len(used_champs)))
-#             champ_list = query_selectall(sql, args, True)
-#             used_champs += champ_list
-#             embed.add_field(name=lane.capitalize(), value='/\u200b'.join(champ_list), inline=False)
-#     await ctx.send(embed=embed)
+    embed = Embed(color=color)
+    if lane == 'team':
+        used_champs = []
+        embed.set_author(name=lane.capitalize(), icon_url=team_icon_url)
+        for lane in lane_info.keys():
+            column = lane_info[lane]['db_field']
+            with Session() as session:
+                champ_list = session.query(Leaguechamps).where(column, Leaguechamps.name.not_in(used_champs)).order_by(
+                    func.random()).limit(times).all()
+            champ_names = [champ.name for champ in champ_list]
+            used_champs += champ_names
+            embed.add_field(name=lane.capitalize(), value='/\u200b'.join(champ_names), inline=False)
+    else:
+        column = lane_info[lane]['db_field']
+        with Session() as session:
+            champ_list = session.query(Leaguechamps).where(column).order_by(func.random()).limit(times).all()
+        name_list = [champ.name for champ in champ_list]
+
+        embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + icon_names[lane])
+        embed.add_field(name='\u200b', value='\n'.join(name_list))
+    await ctx.send(embed=embed)
