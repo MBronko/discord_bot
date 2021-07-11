@@ -24,7 +24,7 @@ icon_names = {
     'adc': '9/97/Bottom_icon.png',
     'support': 'e/e0/Support_icon.png'
 }
-team_icon_url = 'https://cdn.discordapp.com/attachments/702124910981415005/704348781965213746/gotawamapa.png'
+team_icon_url = 'https://static.wikia.nocookie.net/leagueoflegends/images/8/80/Summoner%27s_Rift_icon.png'
 
 hours_cd = 12
 minutes_cd = 0
