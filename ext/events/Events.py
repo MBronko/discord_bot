@@ -12,7 +12,7 @@ class Events(Cog):
 
     @Cog.listener()
     async def on_command(self, ctx):
-        with open('../logs.txt', 'a') as file:
+        with open('logs.txt', 'a') as file:
             to_log = [
                 datetime.now(),
                 ctx.author,

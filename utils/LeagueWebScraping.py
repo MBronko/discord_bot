@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 from sqlalchemy import func
 import requests
 
+icon_url_prefix = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/'
+team_icon_url = 'https://static.wikia.nocookie.net/leagueoflegends/images/8/80/Summoner%27s_Rift_icon.png'
 lane_info = {
     'top': {'icon_name': 'e/ef/Top_icon.png', 'db_field': Leaguechamps.top},
     'jungle': {'icon_name': '1/1b/Jungle_icon.png', 'db_field': Leaguechamps.jungle},
@@ -13,24 +15,14 @@ lane_info = {
     'support': {'icon_name': 'e/e0/Support_icon.png', 'db_field': Leaguechamps.support}
 }
 
-wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions_by_draft_position'
-gg_url = 'https://champion.gg/statistics/?league=plat'
-
-icon_url_prefix = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/'
-icon_names = {
-    'top': 'e/ef/Top_icon.png',
-    'jungle': '1/1b/Jungle_icon.png',
-    'mid': '9/98/Middle_icon.png',
-    'adc': '9/97/Bottom_icon.png',
-    'support': 'e/e0/Support_icon.png'
-}
-team_icon_url = 'https://static.wikia.nocookie.net/leagueoflegends/images/8/80/Summoner%27s_Rift_icon.png'
-
 hours_cd = 12
 minutes_cd = 0
 seconds_cd = 0
 
 db_identifier = 'lolchamps'
+
+wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions_by_draft_position'
+gg_url = 'https://champion.gg/statistics/?league=plat'
 
 
 async def parse_lolwiki(html):
@@ -163,6 +155,6 @@ async def display_champions(ctx, times, lane, color):
             champ_list = session.query(Leaguechamps).where(column).order_by(func.random()).limit(times).all()
         name_list = [champ.name for champ in champ_list]
 
-        embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + icon_names[lane])
+        embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + lane_info[lane]['icon_name'])
         embed.add_field(name='\u200b', value='\n'.join(name_list))
     await ctx.send(embed=embed)

@@ -17,10 +17,11 @@ def get_prefix(bot, message):
 
 def get_extensions():
     ext = []
-    for root, directories, files in os.walk('src/ext'):
+    for root, directories, files in os.walk('ext'):
         if DEBUG or 'debug' not in root:
-            new_root = '.'.join(root.split('/')[1:])
+            new_root = root.replace('/', '.')
             for file in files:
                 if file.endswith('.py') and not file.startswith('Template'):
                     ext.append(f'{new_root}.{file[:-3]}')
+
     return ext

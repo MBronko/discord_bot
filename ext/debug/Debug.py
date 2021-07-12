@@ -6,6 +6,7 @@ from utils.Models import Session, Rules, Leaguechamps
 
 class Debug(commands.Cog):
     """DEBUG"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,6 +33,7 @@ class Debug(commands.Cog):
             session.query(Rules).delete()
             session.query(Leaguechamps).delete()
             session.commit()
+
         print("Cleared database")
         await ctx.send("Cleared database")
 
