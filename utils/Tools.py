@@ -19,7 +19,7 @@ def get_extensions():
     ext = []
     for root, directories, files in os.walk('ext'):
         if (DEBUG or 'debug' not in root.lower()) and '__pycache__' not in root:
-            new_root = root.replace('/', '.')
+            new_root = root.replace(os.path.sep, '.')
             for file in files:
                 if file.endswith('.py') and not file.startswith('Template'):
                     ext.append(f'{new_root}.{file[:-3]}')
