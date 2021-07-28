@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import command, errors
 from utils.Tools import get_extensions
-from utils.Models import Session, Rules, Leaguechamps
+from utils.Models import Session, Base
 
 
 class Debug(commands.Cog):
@@ -30,14 +30,14 @@ class Debug(commands.Cog):
     @commands.is_owner()
     async def cleardb(self, ctx):
         with Session() as session:
-            session.query(Rules).delete()
-            session.query(Leaguechamps).delete()
+            for model in Base.registry.mappers:
+                session.query(model.class_).delete()
             session.commit()
 
         print("Cleared database")
         await ctx.send("Cleared database")
 
-    @command()
+    @command(aliases=('logout',))
     @commands.is_owner()
     async def stop(self, ctx):
         await ctx.send('Bye')

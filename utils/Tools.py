@@ -18,7 +18,7 @@ def get_prefix(bot, message):
 def get_extensions():
     ext = []
     for root, directories, files in os.walk('ext'):
-        if DEBUG or 'debug' not in root:
+        if (DEBUG or 'debug' not in root.lower()) and '__pycache__' not in root:
             new_root = root.replace('/', '.')
             for file in files:
                 if file.endswith('.py') and not file.startswith('Template'):

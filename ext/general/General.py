@@ -1,7 +1,6 @@
 from discord.ext import commands
 from discord.ext.commands import command
 from utils.Convert import convert_default
-from utils.Common import MAX_REPEAT
 from discord import Embed
 import requests
 
@@ -59,7 +58,7 @@ class General(commands.Cog):
         await ctx.send('siema')
 
     @command(aliases=('link',))
-    async def shorten(self, ctx, link):
+    async def shorten(self, ctx, link=''):
         """Shorten your link"""
         r = requests.post("https://bronko.me", data={'shorten': link}).text.strip()
         msg = f"<{r}>" if r != "Segmentation fault" else "Invalid URL"
@@ -73,6 +72,8 @@ class General(commands.Cog):
     @command()
     async def repeat(self, ctx, *content: str):
         """Repeat message a number of times"""
+        max_repeat = 10
+
         length = len(content)
         if length == 0:
             return await ctx.send(f'{ctx.prefix}repeat `message` [times]')
@@ -81,7 +82,7 @@ class General(commands.Cog):
 
         try:
             times = int(content[-1])
-            times = times if times < MAX_REPEAT else MAX_REPEAT
+            times = times if times < max_repeat else max_repeat
             content_str = " ".join(content[:-1])
         except ValueError:
             times = 1

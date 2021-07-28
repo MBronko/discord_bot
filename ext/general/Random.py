@@ -9,7 +9,7 @@ class Random(commands.Cog):
 
     @command()
     async def choose(self, ctx, *choices: str):
-        """Choose one random thing"""
+        """Choose one random thing from list"""
         if choices:
             await ctx.send(random.choice(choices))
 
@@ -48,6 +48,7 @@ class Random(commands.Cog):
 
     @command()
     async def coinflip(self, ctx):
+        """Roll heads or tails"""
         await ctx.send(random.choice(['heads', 'tails']))
 
 
