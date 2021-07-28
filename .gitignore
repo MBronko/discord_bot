@@ -1,7 +1,7 @@
 # Custom
-token.txt
 logs.txt
 dcbot.db
+.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

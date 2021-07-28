@@ -1,6 +1,10 @@
 # Discord bot by Bronko
 
 ## Setup
+
+### Create bot account, generate token, invite to server
+[How to create bot and generate its token?](https://discordpy.readthedocs.io/en/stable/discord.html)
+
 ### Install python and pip if it's not already installed
 
 ### Download the bot
@@ -8,6 +12,8 @@
 git clone https://github.com/MBronko/discord_bot
 cd discord_bot
 ```
+
+### create .env file using .env.temp template and put previously generated token inside
 
 ### create virtual environment, activate it and install required modules
 #### linux
@@ -22,11 +28,6 @@ python -m venv venv
 .\venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
-
-### create file token.txt with your bot token inside
-[how to create and invite bot to my server?](https://discordpy.readthedocs.io/en/stable/discord.html) 
-
-```echo your_token > token.txt```
 
 ### finally run your bot
 with venv activated\

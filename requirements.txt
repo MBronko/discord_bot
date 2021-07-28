@@ -12,6 +12,7 @@ idna==2.10
 multidict==5.1.0
 pycparser==2.20
 PyNaCl==1.4.0
+python-dotenv==0.19.0
 requests==2.25.1
 six==1.16.0
 soupsieve==2.2.1
