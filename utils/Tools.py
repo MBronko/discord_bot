@@ -1,10 +1,11 @@
 from discord.ext import commands
 from utils.Models import Session, Rules
 from utils.Common import DEFAULT_PREFIX, DEBUG
+import random
 import os
 
 
-def get_prefix(bot, message):
+def get_prefix(bot, message) -> list[str]:
     if message.guild is None:
         prefix = DEFAULT_PREFIX
     else:
@@ -15,7 +16,7 @@ def get_prefix(bot, message):
     return commands.when_mentioned_or(prefix)(bot, message)
 
 
-def get_extensions():
+def get_extensions() -> list[str]:
     ext = []
     for root, directories, files in os.walk('ext'):
         if (DEBUG or 'debug' not in root.lower()) and '__pycache__' not in root:
@@ -25,3 +26,7 @@ def get_extensions():
                     ext.append(f'{new_root}.{file[:-3]}')
 
     return ext
+
+
+def random_color() -> int:
+    return random.randint(0, 0xffffff)

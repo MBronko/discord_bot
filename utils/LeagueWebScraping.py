@@ -1,5 +1,6 @@
 from discord import Embed
 from utils.Models import Session, Rules, Leaguechamps
+from utils.Common import EMBED_EMPTY_VAL
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from sqlalchemy import func
@@ -156,5 +157,5 @@ async def display_champions(ctx, times, lane, color):
         name_list = [champ.name for champ in champ_list]
 
         embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + lane_info[lane]['icon_name'])
-        embed.add_field(name='\u200b', value='\n'.join(name_list))
+        embed.add_field(name=EMBED_EMPTY_VAL, value='\n'.join(name_list))
     await ctx.send(embed=embed)
