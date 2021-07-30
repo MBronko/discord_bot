@@ -36,7 +36,7 @@ class Todolist(Base):
     id = Column("id", Integer, primary_key=True)
     todo_id = Column("todo_id", String)
     server_id = Column("server_id", Integer)
-    msg_id = Column("msg_id", Integer)
+    msg_id = Column("msg_id", Integer, default=0)
     title = Column("title", String)
     color = Column("color", Integer)
 
@@ -48,7 +48,7 @@ class TodoSect(Base):
     todo_id = Column("todo_id", String)
     server_id = Column("server_id", Integer)
     title = Column("title", String, default="title")
-    content = Column("content", String, default="content")
+    content = Column("content", String, default="")
     done = Column("done", Boolean, default=False)
     timestamp = Column("timestamp", TIMESTAMP, server_default=func.now())
 
