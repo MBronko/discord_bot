@@ -1,10 +1,10 @@
 from discord.ext import commands
-from discord.ext.commands import command, errors
+from discord.ext.commands import command, Cog, Context, errors
 from utils.Tools import get_extensions
 from utils.Models import Session, Base
 
 
-class Debug(commands.Cog):
+class Debug(Cog):
     """DEBUG"""
 
     def __init__(self, bot):
@@ -12,7 +12,7 @@ class Debug(commands.Cog):
 
     @command()
     @commands.is_owner()
-    async def reload(self, ctx):
+    async def reload(self, ctx: Context):
         to_reload = get_extensions()
         to_unload = [key for key in self.bot.extensions.keys() if key not in to_reload]
         for extension in to_unload:
@@ -23,19 +23,19 @@ class Debug(commands.Cog):
             except errors.ExtensionNotLoaded:
                 self.bot.load_extension(extension)
 
-        print("Reloaded extensions")
-        await ctx.send("Reloaded extensions")
+        print('Reloaded extensions')
+        await ctx.send('Reloaded extensions')
 
     @command()
     @commands.is_owner()
-    async def cleardb(self, ctx):
+    async def cleardb(self, ctx: Context):
         with Session() as session:
             for model in Base.registry.mappers:
                 session.query(model.class_).delete()
             session.commit()
 
-        print("Cleared database")
-        await ctx.send("Cleared database")
+        print('Cleared database')
+        await ctx.send('Cleared database')
 
     @command(aliases=('logout',))
     @commands.is_owner()

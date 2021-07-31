@@ -1,5 +1,5 @@
-from discord.ext.commands.context import Context
 from discord.ext import commands
+from discord.ext.commands import Cog, Context
 from discord import Embed
 from utils.TodoListTools import generate_unique_id, create_todo_embed, parse_todo_args, update_list
 from utils.Queries import get_todo_list, get_all_todo_lists, get_todo_sects
@@ -8,7 +8,7 @@ from utils.Tools import fetch_message, random_color
 from utils.Common import EMBED_EMPTY_VAL
 
 
-class todolist(commands.Cog):
+class todolist(Cog):
     def __init__(self, bot):
         self.bot = bot
 

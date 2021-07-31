@@ -1,20 +1,19 @@
-from discord.ext import commands
-from discord.ext.commands import command
+from discord.ext.commands import command, Cog, Context
 import random
 
 
-class Random(commands.Cog):
+class Random(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @command()
-    async def choose(self, ctx, *choices: str):
+    async def choose(self, ctx: Context, *choices: str):
         """Choose one random thing from list"""
         if choices:
             await ctx.send(random.choice(choices))
 
     @command(aliases=('subset',))
-    async def sample(self, ctx, *choices: str):
+    async def sample(self, ctx: Context, *choices: str):
         """Get a random subset"""
         length = len(choices)
         if length == 0:
@@ -31,7 +30,7 @@ class Random(commands.Cog):
         await ctx.send(' '.join(random.sample(choices, n)))
 
     @command()
-    async def rng(self, ctx, min_val=0, max_val=10):
+    async def rng(self, ctx: Context, min_val=0, max_val=10):
         """Get a random number in bounds"""
         try:
             min_val = int(min_val)
@@ -44,10 +43,10 @@ class Random(commands.Cog):
 
         if min_val > max_val:
             min_val, max_val = max_val, min_val
-        await ctx.send(random.randint(min_val, max_val))
+        await ctx.send(str(random.randint(min_val, max_val)))
 
     @command()
-    async def coinflip(self, ctx):
+    async def coinflip(self, ctx: Context):
         """Roll heads or tails"""
         await ctx.send(random.choice(['heads', 'tails']))
 

@@ -1,20 +1,20 @@
 from discord import Embed
+from discord.ext.commands import Context
+
 from utils.Models import Session, Rules, Leaguechamps
+from utils.Queries import get_champ_by_name, get_champs_by_lane, get_champs_by_lane_not_in_list
 from utils.Common import EMBED_EMPTY_VAL
+from leaguetools.Constants import lane_info
+from leaguetools.WebScrapingParsers import parse_lolwiki, parse_gg
+
 from datetime import datetime, timedelta
-from bs4 import BeautifulSoup
 from sqlalchemy import func
+from bs4 import BeautifulSoup
+from typing import Optional
 import requests
 
 icon_url_prefix = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/'
 team_icon_url = 'https://static.wikia.nocookie.net/leagueoflegends/images/8/80/Summoner%27s_Rift_icon.png'
-lane_info = {
-    'top': {'icon_name': 'e/ef/Top_icon.png', 'db_field': Leaguechamps.top},
-    'jungle': {'icon_name': '1/1b/Jungle_icon.png', 'db_field': Leaguechamps.jungle},
-    'mid': {'icon_name': '9/98/Middle_icon.png', 'db_field': Leaguechamps.mid},
-    'adc': {'icon_name': '9/97/Bottom_icon.png', 'db_field': Leaguechamps.adc},
-    'support': {'icon_name': 'e/e0/Support_icon.png', 'db_field': Leaguechamps.support}
-}
 
 hours_cd = 12
 minutes_cd = 0
@@ -25,58 +25,23 @@ db_identifier = 'lolchamps'
 wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions_by_draft_position'
 gg_url = 'https://champion.gg/statistics/?league=plat'
 
-
-async def parse_lolwiki(html):
-    result = []
-    table = html.find("table", class_="article-table sortable")  # table with all champions
-
-    for row in table.find_all('tr')[1:]:  # iterate over all positions in table
-        champ_data = {'name': row.find('td').text.strip()}
-
-        lanes = list(lane_info.keys())
-        for idx, td in enumerate(row.find_all('td')[1:-1]):
-            champ_data[lanes[idx]] = bool(td.find_all())  # or td.text.strip() != '' # to include op.gg suggestions
-        result.append(champ_data)
-    return result
-
-
-async def parse_gg(html):
-    table_class = 'Champions__TableWrapper-rli9op-0 AllChampionsTable__TableContentWrapper-cpgif4-0 jlzfMF'
-    div = html.find('div', class_=table_class).find_all('div', recursive=False)[1].find().find()
-    rows = div.find_all('div', recursive=False)
-
-    buffer = {}
-    for row in rows:
-        name = row.find('span', class_='champion-name').text
-
-        if name not in buffer:
-            buffer[name] = {'name': name, 'top': False, 'jungle': False, 'mid': False, 'adc': False, 'support': False}
-
-        href = row.find('a', class_='champion-tier-container')['href']  # href looks like '/champion/Kassadin/Middle'
-        lane = href.split('/')[-1].lower()
-        lane = lane if lane != 'middle' else 'mid'
-
-        buffer[name][lane] = True
-    return buffer.values()
-
-
 fetch_data = [[wiki_url, parse_lolwiki], [gg_url, parse_gg]]
 
 
-async def request_and_parse(ctx, url, callback):
+async def request_and_parse(ctx: Context, url: str, callback) -> Optional[dict]:
     res = requests.get(url)
     if res.status_code == 200:
         return await callback(BeautifulSoup(res.text, 'html.parser'))
     await ctx.send(f'Fail: <{url}> returned code {res.status_code}')
-    return False
+    return None
 
 
-async def update_database(champions):
+async def update_database(champions: dict) -> None:
     if champions:
         bulk_save = []
         with Session() as session:
             for champion in champions:
-                db_champ = session.query(Leaguechamps).where(Leaguechamps.name == champion['name']).first()
+                db_champ = get_champ_by_name(session, champion['name'])
                 if not db_champ:
                     db_champ = Leaguechamps()
                     db_champ.name = champion['name']
@@ -92,7 +57,7 @@ async def update_database(champions):
             session.commit()
 
 
-async def fetch_champions(ctx):
+async def fetch_champions(ctx: Context) -> bool:
     print('fetching champions')
 
     update = False
@@ -123,7 +88,7 @@ async def fetch_champions(ctx):
     return False
 
 
-async def display_champions(ctx, times, lane, color):
+async def display_champions(ctx: Context, times: int, lane: str, color: int):
     # check if update is needed
     with Session() as session:
         last_time = datetime.utcnow() - timedelta(hours=hours_cd, minutes=minutes_cd, seconds=seconds_cd)
@@ -131,10 +96,6 @@ async def display_champions(ctx, times, lane, color):
         if not res:
             await fetch_champions(ctx)
 
-    try:
-        times = int(times)
-    except ValueError:
-        times = 1
     if times < 1:
         times = 1
 
@@ -145,15 +106,14 @@ async def display_champions(ctx, times, lane, color):
         for lane in lane_info.keys():
             column = lane_info[lane]['db_field']
             with Session() as session:
-                champ_list = session.query(Leaguechamps).where(column, Leaguechamps.name.not_in(used_champs)).order_by(
-                    func.random()).limit(times).all()
+                champ_list = get_champs_by_lane_not_in_list(session, column, used_champs, times)
             champ_names = [champ.name for champ in champ_list]
             used_champs += champ_names
             embed.add_field(name=lane.capitalize(), value='/\u200b'.join(champ_names), inline=False)
     else:
         column = lane_info[lane]['db_field']
         with Session() as session:
-            champ_list = session.query(Leaguechamps).where(column).order_by(func.random()).limit(times).all()
+            champ_list = get_champs_by_lane(session, column, times)
         name_list = [champ.name for champ in champ_list]
 
         embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + lane_info[lane]['icon_name'])

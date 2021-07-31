@@ -1,16 +1,17 @@
 from discord.ext import commands
+from discord.ext.commands import Cog, Context
 from discord import Embed
 from utils.Models import Session, Rules
 from utils.Common import PREFIX_BLACKLIST
 
 
-class Settings(commands.Cog):
+class Settings(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.group()
     @commands.guild_only()
-    async def settings(self, ctx):
+    async def settings(self, ctx: Context):
         """Change bot settings"""
         settings_list = [
             ('Prefix', 'prefix'),
@@ -23,14 +24,14 @@ class Settings(commands.Cog):
         if not ctx.invoked_subcommand:
             embed = Embed(description='Change bot settings here')
 
-            embed.set_author(name='Mimi mentor settings', icon_url=self.bot.user.avatar_url)
+            embed.set_author(name=f'{ctx.bot.user.name} settings', icon_url=self.bot.user.avatar_url)
             for setting in settings_list:
-                embed.add_field(name=setting[0], value=f"`{ctx.prefix}settings {setting[1]}`")
+                embed.add_field(name=setting[0], value=f'`{ctx.prefix}settings {setting[1]}`')
 
             await ctx.send(embed=embed)
 
     @settings.command(alias='pref')
-    async def prefix(self, ctx, new_prefix=None):
+    async def prefix(self, ctx: Context, new_prefix=None):
         """Set prefix to address bot"""
         if new_prefix is None:
             embed = Embed(description='Set prefix to address bot')

@@ -1,4 +1,5 @@
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, Context
+from discord.errors import DiscordException
 from discord.ext import commands
 from utils.Common import DEBUG
 import traceback
@@ -10,7 +11,7 @@ class CommandErrorHandler(Cog):
         self.bot = bot
 
     @Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: Context, error: DiscordException):
         if hasattr(ctx.command, 'on_error'):
             return
 

@@ -1,14 +1,16 @@
+from discord.ext.commands import Context, Bot
 from discord.ext import commands
+from discord import Message, NotFound
+
 from utils.Models import Session, Rules
 from utils.Common import DEFAULT_PREFIX, DEBUG
-from discord.ext.commands.context import Context
-from discord import Message, NotFound
+
 from typing import Optional
 import random
 import os
 
 
-def get_prefix(bot, message) -> list[str]:
+def get_prefix(bot: Bot, message: Message) -> list[str]:
     if message.guild is None:
         prefix = DEFAULT_PREFIX
     else:
@@ -20,9 +22,13 @@ def get_prefix(bot, message) -> list[str]:
 
 
 def get_extensions() -> list[str]:
+    blacklisted_dirs = ['debug', '__pycache__']
     ext = []
+
     for root, directories, files in os.walk('ext'):
-        if (DEBUG or 'debug' not in root.lower()) and '__pycache__' not in root:
+        skip = any(ext_dir in root.lower() for ext_dir in blacklisted_dirs)
+
+        if DEBUG or not skip:
             new_root = root.replace(os.path.sep, '.')
             for file in files:
                 if file.endswith('.py') and not file.startswith('Template'):

@@ -1,15 +1,15 @@
 from discord.ext import commands
-from discord.ext.commands import command
+from discord.ext.commands import command, Cog, Context
 import discord
 
 
-class Users(commands.Cog):
+class Users(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @command()
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, members: commands.Greedy[discord.Member], *, reason=""):
+    async def kick(self, ctx: Context, members: commands.Greedy[discord.Member], *, reason=""):
         for member in members:
             if ctx.author.top_role > member.top_role:
                 reason = '{}: {}'.format(ctx.author.display_name, reason)
@@ -20,7 +20,7 @@ class Users(commands.Cog):
 
     @command()
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, members: commands.Greedy[discord.Member], *, reason=""):
+    async def ban(self, ctx: Context, members: commands.Greedy[discord.Member], *, reason=""):
         for member in members:
             if ctx.author.top_role > member.top_role:
                 reason = '{}: {}'.format(ctx.author.display_name, reason)

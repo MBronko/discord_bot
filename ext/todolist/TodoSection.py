@@ -1,4 +1,4 @@
-from discord.ext.commands.context import Context
+from discord.ext.commands import Cog, Context
 from discord.ext import commands
 from utils.TodoListTools import parse_todo_args, parse_section_args, update_list
 from utils.Queries import get_todo_list, get_todo_sects
@@ -6,7 +6,7 @@ from utils.Models import Session, TodoSect
 from sqlalchemy import func
 
 
-class todosection(commands.Cog):
+class todosection(Cog):
     def __init__(self, bot):
         self.bot = bot
 

@@ -1,13 +1,13 @@
-from discord.ext import commands
-from discord.ext.commands import command
+from discord.ext.commands import command, Cog
+from discord.ext.commands.context import Context
 
 
-class Template(commands.Cog):
+class Template(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @command()
-    async def template(self, ctx):
+    async def template(self, ctx: Context):
         pass
 
 
