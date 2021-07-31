@@ -6,7 +6,6 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-# basically just settings for each server
 class Rules(Base):
     __tablename__ = "rules"
 
@@ -19,7 +18,6 @@ class Rules(Base):
     timestamp = Column("timestamp", TIMESTAMP, server_default=func.now())
 
 
-# store league of legends champions info
 class Leaguechamps(Base):
     __tablename__ = "leaguechamps"
 
@@ -30,6 +28,29 @@ class Leaguechamps(Base):
     mid = Column("mid", Boolean, default=False)
     adc = Column("adc", Boolean, default=False)
     support = Column("support", Boolean, default=False)
+
+
+class Todolist(Base):
+    __tablename__ = 'todolist'
+
+    id = Column("id", Integer, primary_key=True)
+    todo_id = Column("todo_id", String)
+    server_id = Column("server_id", Integer)
+    msg_id = Column("msg_id", Integer, default=0)
+    title = Column("title", String)
+    color = Column("color", Integer)
+
+
+class TodoSect(Base):
+    __tablename__ = 'todosect'
+
+    id = Column("id", Integer, primary_key=True)
+    todo_id = Column("todo_id", String)
+    server_id = Column("server_id", Integer)
+    title = Column("title", String, default="title")
+    content = Column("content", String, default="")
+    done = Column("done", Boolean, default=False)
+    timestamp = Column("timestamp", TIMESTAMP, server_default=func.now())
 
 
 engine = create_engine('sqlite:///dcbot.db')

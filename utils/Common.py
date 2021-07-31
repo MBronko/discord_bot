@@ -15,3 +15,5 @@ DEBUG = environ['DEBUG'] == 'True'
 PREFIX_BLACKLIST = ['']
 
 DEFAULT_PREFIX = '' if DEBUG else '!'
+
+EMBED_EMPTY_VAL = '\u200b'
