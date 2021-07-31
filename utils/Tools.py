@@ -1,6 +1,9 @@
 from discord.ext import commands
 from utils.Models import Session, Rules
 from utils.Common import DEFAULT_PREFIX, DEBUG
+from discord.ext.commands.context import Context
+from discord import Message, NotFound
+from typing import Optional
 import random
 import os
 
@@ -30,3 +33,10 @@ def get_extensions() -> list[str]:
 
 def random_color() -> int:
     return random.randint(0, 0xffffff)
+
+
+async def fetch_message(ctx: Context, msg_id: int) -> Optional[Message]:
+    try:
+        return await ctx.fetch_message(msg_id)
+    except NotFound:
+        return None
