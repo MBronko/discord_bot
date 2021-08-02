@@ -17,3 +17,6 @@ PREFIX_BLACKLIST = ['']
 DEFAULT_PREFIX = '' if DEBUG else '!'
 
 EMBED_EMPTY_VAL = '\u200b'
+
+GREEN_TICK = '✅'
+RED_X = '❌'

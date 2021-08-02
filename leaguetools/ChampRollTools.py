@@ -28,6 +28,11 @@ gg_url = 'https://champion.gg/statistics/?league=plat'
 fetch_data = [[wiki_url, parse_lolwiki], [gg_url, parse_gg]]
 
 
+def parse_champion_name(name: str):
+    banned_chars = ' \'.&'
+    return ''.join(x for x in name.lower() if x not in banned_chars)
+
+
 async def request_and_parse(ctx: Context, url: str, callback) -> Optional[dict]:
     res = requests.get(url)
     if res.status_code == 200:
@@ -45,6 +50,7 @@ async def update_database(champions: dict) -> None:
                 if not db_champ:
                     db_champ = Leaguechamps()
                     db_champ.name = champion['name']
+                    db_champ.parsedname = parse_champion_name(champion['name'])
                     bulk_save.append(db_champ)
 
                 db_champ.top = db_champ.top or champion['top']

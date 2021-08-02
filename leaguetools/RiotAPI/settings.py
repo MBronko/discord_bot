@@ -33,7 +33,8 @@ Settings(
             'BACKEND': 'pyot.stores.Omnistone',
             'LOG_LEVEL': log_level,
             'EXPIRATIONS': {
-                'summoner_v4_by_name': 30  # expiration in seconds
+                'summoner_v4_by_name': 300,  # expiration in seconds
+                'champion_mastery_v4_by_champion_id': 300
             }
         },
         {
