@@ -5,6 +5,9 @@
 ### Create bot account, generate token, invite to server
 [How to create bot and generate its token?](https://discordpy.readthedocs.io/en/stable/discord.html)
 
+### To use riot api features you have to obtain riot api key
+[How to register product and get riot api key?](https://developer.riotgames.com/docs/portal)
+
 ### Install python and pip if it's not already installed
 
 ### Download the bot
@@ -13,7 +16,7 @@ git clone https://github.com/MBronko/discord_bot
 cd discord_bot
 ```
 
-### create .env file using .env.temp template and put previously generated token inside
+### create .env file using .env.temp template and put previously generated token and key inside
 
 ### create virtual environment, activate it and install required modules
 #### linux
@@ -30,11 +33,18 @@ python -m pip install -r requirements.txt
 ```
 
 ### finally run your bot
-with venv activated\
-```python3 main.py```
-
-with venv deactivated\
-```venv/bin/python3 main.py```
+#### linux
+```
+python3 main.py           # with venv activated
+                          # or
+venv/bin/python3 main.py  # with venv deactivated
+```
+#### windows
+```
+python main.py                # with venv activated
+                              # or
+venv\Scripts\python main.py  # with venv deactivated
+```
 
 ## Setup as Systemd service
 
