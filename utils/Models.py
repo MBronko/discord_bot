@@ -23,11 +23,20 @@ class Leaguechamps(Base):
 
     id = Column('id', Integer, primary_key=True)
     name = Column('name', String, default='')
+    parsedname = Column('parsedname', String, default='')
     top = Column('top', Boolean, default=False)
     jungle = Column('jungle', Boolean, default=False)
     mid = Column('mid', Boolean, default=False)
     adc = Column('adc', Boolean, default=False)
     support = Column('support', Boolean, default=False)
+
+
+class LeaguechampsKeyCache(Base):
+    __tablename__ = 'LeagueChampsKeyCache'
+
+    id = Column('id', Integer, primary_key=True)
+    key = Column('key', String, default='')
+    parsedname = Column('parsedname', String, default='')
 
 
 class Todolist(Base):

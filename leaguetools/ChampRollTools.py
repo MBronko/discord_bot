@@ -4,7 +4,7 @@ from discord.ext.commands import Context
 from utils.Models import Session, Rules, Leaguechamps
 from utils.Queries import get_champ_by_name, get_champs_by_lane, get_champs_by_lane_not_in_list
 from utils.Common import EMBED_EMPTY_VAL
-from leaguetools.Constants import lane_info
+from leaguetools.Constants import lane_data, team_icon_url
 from leaguetools.WebScrapingParsers import parse_lolwiki, parse_gg
 
 from datetime import datetime, timedelta
@@ -13,8 +13,6 @@ from bs4 import BeautifulSoup
 from typing import Optional
 import requests
 
-icon_url_prefix = 'https://vignette.wikia.nocookie.net/leagueoflegends/images/'
-team_icon_url = 'https://static.wikia.nocookie.net/leagueoflegends/images/8/80/Summoner%27s_Rift_icon.png'
 
 hours_cd = 12
 minutes_cd = 0
@@ -26,6 +24,11 @@ wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions_by_draft_p
 gg_url = 'https://champion.gg/statistics/?league=plat'
 
 fetch_data = [[wiki_url, parse_lolwiki], [gg_url, parse_gg]]
+
+
+def parse_champion_name(name: str):
+    banned_chars = ' \'.&'
+    return ''.join(x for x in name.lower() if x not in banned_chars)
 
 
 async def request_and_parse(ctx: Context, url: str, callback) -> Optional[dict]:
@@ -45,13 +48,14 @@ async def update_database(champions: dict) -> None:
                 if not db_champ:
                     db_champ = Leaguechamps()
                     db_champ.name = champion['name']
+                    db_champ.parsedname = parse_champion_name(champion['name'])
                     bulk_save.append(db_champ)
 
-                db_champ.top = db_champ.top or champion['top']
-                db_champ.jungle = db_champ.jungle or champion['jungle']
-                db_champ.mid = db_champ.mid or champion['mid']
-                db_champ.adc = db_champ.adc or champion['adc']
-                db_champ.support = db_champ.support or champion['support']
+                db_champ.top = db_champ.top or champion['TOP']
+                db_champ.jungle = db_champ.jungle or champion['JUNGLE']
+                db_champ.mid = db_champ.mid or champion['MIDDLE']
+                db_champ.adc = db_champ.adc or champion['BOTTOM']
+                db_champ.support = db_champ.support or champion['UTILITY']
 
             session.bulk_save_objects(bulk_save)
             session.commit()
@@ -100,22 +104,25 @@ async def display_champions(ctx: Context, times: int, lane: str, color: int):
         times = 1
 
     embed = Embed(color=color)
-    if lane == 'team':
+    if lane == 'TEAM':
         used_champs = []
         embed.set_author(name=lane.capitalize(), icon_url=team_icon_url)
-        for lane in lane_info.keys():
-            column = lane_info[lane]['db_field']
+        for lane, data in list(lane_data.items())[:5]:
+            column = data['db_field']
+
             with Session() as session:
                 champ_list = get_champs_by_lane_not_in_list(session, column, used_champs, times)
             champ_names = [champ.name for champ in champ_list]
             used_champs += champ_names
-            embed.add_field(name=lane.capitalize(), value='/\u200b'.join(champ_names), inline=False)
+            embed.add_field(name=data['display_name'], value='/\u200b'.join(champ_names), inline=False)
     else:
-        column = lane_info[lane]['db_field']
+        column = lane_data[lane]['db_field']
+        icon_url = lane_data[lane]['icon_url']
+
         with Session() as session:
             champ_list = get_champs_by_lane(session, column, times)
         name_list = [champ.name for champ in champ_list]
 
-        embed.set_author(name=lane.capitalize(), icon_url=icon_url_prefix + lane_info[lane]['icon_name'])
+        embed.set_author(name=lane_data[lane]['display_name'], icon_url=icon_url)
         embed.add_field(name=EMBED_EMPTY_VAL, value='\n'.join(name_list))
     await ctx.send(embed=embed)
