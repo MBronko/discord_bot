@@ -9,7 +9,8 @@ lane_data: dict[str, dict[str]] = {
     'MIDDLE':  {'display_name': 'Mid',     'db_field': Leaguechamps.mid},
     'BOTTOM':  {'display_name': 'Adc',     'db_field': Leaguechamps.adc},
     'UTILITY': {'display_name': 'Support', 'db_field': Leaguechamps.support},
-    'FILL':    {'display_name': 'Fill',    'db_field': None}
+    'FILL':    {'display_name': 'Fill',    'db_field': None},
+    'UNSELECTED': {'display_name': ' Unselected', 'db_field': None}
 }
 
 for idx, key in enumerate(lane_data):
