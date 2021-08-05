@@ -9,6 +9,8 @@
 [How to register product and get riot api key?](https://developer.riotgames.com/docs/portal)
 
 ### Install python and pip if it's not already installed
+Python version must be 3.9 or newer \
+use ```python3 --version``` to check your python version (```python --version``` on windows)
 
 ### Download the bot
 ```
