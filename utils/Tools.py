@@ -4,6 +4,7 @@ from discord import Message, NotFound
 
 from utils.Models import Session, Rules
 from utils.Common import DEFAULT_PREFIX, DEBUG
+from leaguetools.RiotAPI.tasks import get_riot_api_status
 
 from typing import Optional
 import random
@@ -25,13 +26,18 @@ def get_extensions() -> list[str]:
     blacklisted_dirs = ['debug', '__pycache__']
     ext = []
 
+    riot_api_active = bool(get_riot_api_status())
+
     for root, directories, files in os.walk('ext'):
         skip = any(ext_dir in root.lower() for ext_dir in blacklisted_dirs)
 
         if DEBUG or not skip:
             new_root = root.replace(os.path.sep, '.')
             for file in files:
-                if file.endswith('.py') and not file.startswith('Template'):
+                valid_file = file.endswith('.py') and not file.startswith('Template')
+                valid_riot_api_key = riot_api_active or 'RiotAPI' not in file
+
+                if valid_file and valid_riot_api_key:
                     ext.append(f'{new_root}.{file[:-3]}')
 
     return ext

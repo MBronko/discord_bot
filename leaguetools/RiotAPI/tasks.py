@@ -1,11 +1,12 @@
 from discord.ext.commands import Context
 from pyot.models import lol
-from pyot.core.exceptions import NotFound
+from pyot.core.exceptions import NotFound, Forbidden
 
 from leaguetools.RiotAPI.tools import parse_possible_champion_keys
 from utils.Models import Session, LeaguechampsKeyCache
 
 from typing import Optional
+import asyncio
 
 
 async def get_specified_champion(ctx: Context, name: tuple[str], champ_func):
@@ -53,3 +54,11 @@ async def get_summoner(ctx: Context, name: str) -> Optional[lol.Summoner]:
             pass
     await ctx.send('Summoner not found')
     return None
+
+
+def get_riot_api_status() -> Optional[lol.Status]:
+    try:
+        return asyncio.run(lol.Status().get())
+    except Forbidden:
+        print('Riot API key is invalid')
+        return None
