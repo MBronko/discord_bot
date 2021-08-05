@@ -1,4 +1,4 @@
-from leaguetools.Constants import lane_info
+from leaguetools.Constants import lane_data
 
 
 async def parse_lolwiki(html):
@@ -8,7 +8,7 @@ async def parse_lolwiki(html):
     for row in table.find_all('tr')[1:]:  # iterate over all positions in table
         champ_data = {'name': row.find('td').text.strip()}
 
-        lanes = list(lane_info.keys())
+        lanes = list(lane_data.keys())
         for idx, td in enumerate(row.find_all('td')[1:-1]):
             champ_data[lanes[idx]] = bool(td.find_all())  # or td.text.strip() != '' # to include op.gg suggestions
         result.append(champ_data)

@@ -10,32 +10,32 @@ class ChampRoll(Cog):
     @command(aliases=('toplane',))
     async def top(self, ctx: Context, times: Optional[int] = 1):
         """Get random top champion"""
-        await display_champions(ctx, times, 'top', 0xCC0000)
+        await display_champions(ctx, times, 'TOP', 0xCC0000)
 
     @command(aliases=('jgl',))
     async def jungle(self, ctx: Context, times: Optional[int] = 1):
         """Get random jungle champion"""
-        await display_champions(ctx, times, 'jungle', 0x339933)
+        await display_champions(ctx, times, 'JUNGLE', 0x339933)
 
     @command(aliases=('middle', 'midlane'))
     async def mid(self, ctx: Context, times: Optional[int] = 1):
         """Get random middle champion"""
-        await display_champions(ctx, times, 'mid', 0xFFCC33)
+        await display_champions(ctx, times, 'MIDDLE', 0xFFCC33)
 
     @command()
     async def adc(self, ctx: Context, times: Optional[int] = 1):
         """Get random adc champion"""
-        await display_champions(ctx, times, 'adc', 0x3399FF)
+        await display_champions(ctx, times, 'BOTTOM', 0x3399FF)
 
     @command(aliases=('supp',))
     async def support(self, ctx: Context, times: Optional[int] = 1):
         """Get random support champion"""
-        await display_champions(ctx, times, 'support', 0xFF99FF)
+        await display_champions(ctx, times, 'UTILITY', 0xFF99FF)
 
     @command()
     async def team(self, ctx: Context, times: Optional[int] = 1):
         """Get random champion for each role"""
-        await display_champions(ctx, times, 'team', 0xA652BB)
+        await display_champions(ctx, times, 'TEAM', 0xA652BB)
 
     @command()
     async def refresh(self, ctx: Context):

@@ -21,7 +21,26 @@ if platform.system() == 'Windows':
 
 from pyot.core import Settings
 
+#  Settings here
+default_exp_time = 300  # default cache expiration in seconds
+
+default_exp_time_endpoints = [
+    'summoner_v4_by_name',
+    'summoner_v4_by_id',
+    'champion_mastery_v4_by_champion_id',
+    'clash_v1_players',
+    'clash_v1_teams',
+    'match_v4_matchlist',
+]
+
+additional_expirations = {
+    # 'endpoint': 5
+}
+#  end of settings
+
 log_level = 30 if DEBUG else 0
+
+expirations = dict({key: default_exp_time for key in default_exp_time_endpoints}, **additional_expirations)
 
 Settings(
     MODEL='LOL',
@@ -32,10 +51,7 @@ Settings(
         {
             'BACKEND': 'pyot.stores.Omnistone',
             'LOG_LEVEL': log_level,
-            'EXPIRATIONS': {
-                'summoner_v4_by_name': 300,  # expiration in seconds
-                'champion_mastery_v4_by_champion_id': 300
-            }
+            'EXPIRATIONS': expirations
         },
         {
             'BACKEND': 'pyot.stores.MerakiCDN',
