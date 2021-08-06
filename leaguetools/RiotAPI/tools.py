@@ -1,10 +1,12 @@
 from pyot.models import lol
-from pyot.utils import PtrCache
 from discord import Embed
 from urllib import parse
+from concurrent.futures import as_completed
+from requests_futures.sessions import FuturesSession
 
 from leaguetools.ChampRollTools import parse_champion_name
 from leaguetools.Constants import lane_data
+from leaguetools.WebScrapingParsers import op_gg_get_summonerid
 from utils.Models import Session, Leaguechamps, LeaguechampsKeyCache
 from utils.Common import EMBED_EMPTY_VAL
 
@@ -73,7 +75,8 @@ def match_history_stats(history: lol.MatchHistory) -> dict:
     pass  # todo get stats like winrate
 
 
-async def gather_summoner_data(summoner: lol.Summoner, position: str, match_history: lol.MatchHistory, top_champions: list[tuple[str, int]]) -> Embed:
+async def gather_summoner_data(summoner: lol.Summoner, position: str, match_history: lol.MatchHistory,
+                               top_champions: list[tuple[str, int]]) -> Embed:
     embed = Embed()
     embed.set_author(name=summoner.name, icon_url=lane_data[position]['icon_url'])
 
@@ -99,4 +102,18 @@ async def gather_summoner_data(summoner: lol.Summoner, position: str, match_hist
 
 
 def refresh_op_gg_profiles(names: list[str]) -> None:
-    pass  # todo refresh op gg profile
+    op_gg_url = 'https://eune.op.gg/summoner/userName='
+
+    with FuturesSession() as session:
+        futures = [session.get(op_gg_url + name) for name in names]
+
+        refresh_url = 'https://eune.op.gg/summoner/ajax/renew.json/'
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        for future in as_completed(futures):
+            summoner_id = op_gg_get_summonerid(future.result())
+
+            if summoner_id:
+                data = f'summonerId={summoner_id}'
+
+                session.post(refresh_url, data=data, headers=headers)

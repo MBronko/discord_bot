@@ -1,4 +1,5 @@
 from leaguetools.Constants import lane_data
+from bs4 import BeautifulSoup
 
 
 async def parse_lolwiki(html):
@@ -33,3 +34,14 @@ async def parse_gg(html):
 
         buffer[name][lane] = True
     return buffer.values()
+
+
+def op_gg_get_summonerid(res) -> int:
+    if res.status_code != 200:
+        print(f'op.gg profile refresh for returned code {res.status_code}')
+        return 0
+
+    html = BeautifulSoup(res.text, 'html.parser')
+
+    div = html.find('div', attrs={'data-summoner-id': True})
+    return div['data-summoner-id']
