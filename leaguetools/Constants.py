@@ -3,6 +3,15 @@ from utils.Models import Leaguechamps
 lane_icon_url_prefix = 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-parties/global/default/icon-position-'
 team_icon_url = 'https://static.wikia.nocookie.net/leagueoflegends/images/8/80/Summoner%27s_Rift_icon.png'
 
+lane_names = [
+    ['TOP', 'top'],
+    ['JUNGLE', 'jungle'],
+    ['MIDDLE', 'mid', 'middle'],
+    ['BOTTOM', 'adc', 'bottom', 'bot'],
+    ['UTILITY', 'support', 'supp', 'utility']
+]
+lane_aliases: dict[str, str] = {name: aliases[0] for aliases in lane_names for name in aliases[1:]}
+
 lane_data: dict[str, dict[str]] = {
     'TOP':     {'display_name': 'Top',     'db_field': Leaguechamps.top},
     'JUNGLE':  {'display_name': 'Jungle',  'db_field': Leaguechamps.jungle},

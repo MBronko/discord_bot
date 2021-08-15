@@ -21,7 +21,7 @@ seconds_cd = 0
 db_identifier = 'lolchamps'
 
 wiki_url = 'https://leagueoflegends.fandom.com/wiki/List_of_champions_by_draft_position'
-gg_url = 'https://champion.gg/statistics/?league=plat'
+gg_url = 'https://blitz.gg/lol/champions/overview?queue=ranked-solo-duo&rank=platinum_plus&region=world'
 
 fetch_data = [[wiki_url, parse_lolwiki], [gg_url, parse_gg]]
 

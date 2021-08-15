@@ -1,4 +1,4 @@
-from leaguetools.Constants import lane_data
+from leaguetools.Constants import lane_data, lane_aliases
 from bs4 import BeautifulSoup
 
 
@@ -17,7 +17,7 @@ async def parse_lolwiki(html):
 
 
 async def parse_gg(html):
-    table_class = 'Champions__TableWrapper-rli9op-0 AllChampionsTable__TableContentWrapper-cpgif4-0 jlzfMF'
+    table_class = 'Champions__TableWrapper-rli9op-0 AllChampionsTable__TableContentWrapper-cpgif4-0 dLWELV cypsLf'
     div = html.find('div', class_=table_class).find_all('div', recursive=False)[1].find().find()
     rows = div.find_all('div', recursive=False)
 
@@ -26,12 +26,10 @@ async def parse_gg(html):
         name = row.find('span', class_='champion-name').text
 
         if name not in buffer:
-            buffer[name] = {'name': name, 'top': False, 'jungle': False, 'mid': False, 'adc': False, 'support': False}
+            buffer[name] = {'name': name, 'TOP': False, 'JUNGLE': False, 'MIDDLE': False, 'BOTTOM': False, 'UTILITY': False}
 
-        href = row.find('a', class_='champion-tier-container')['href']  # href looks like '/champion/Kassadin/Middle'
-        lane = href.split('/')[-1].lower()
-        lane = lane if lane != 'middle' else 'mid'
-
+        role_div = row.find('div', class_='champion-role').find().find()  # content looks like 'role-top'
+        lane = lane_aliases[role_div.text.split('-')[1]]
         buffer[name][lane] = True
     return buffer.values()
 
